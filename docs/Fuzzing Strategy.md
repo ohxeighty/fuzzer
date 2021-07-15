@@ -16,5 +16,10 @@ LLVM SanitizerCoverage
 Dynamic Binary Instrumentation (PIN) 
 
 Look at other fuzzers like AFL, libFuzzer, Honggfuzz
+https://arxiv.org/pdf/1812.11875.pdf
 
+
+
+# Test Case Reduction
+When we get a crash, we want to reduce the input down to the minimum length & complexity that will trigger that crash.
 
