@@ -4,4 +4,5 @@ setup(name="Sour Patch Fuzzer",
         version="0.0",
         description="A sour fuzzer",
         author="The Sour Patch Kids",
-        packages=["sourpatchfuzzer"])
+        packages=["sourpatchfuzzer"],
+        install_requires=["cle"],)
