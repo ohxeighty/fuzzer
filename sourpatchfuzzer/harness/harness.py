@@ -19,57 +19,91 @@ class Harness:
         self.arguments = argv[1:]
         self.pid = -1 
 
-    def monitor(self, pid, r_pipe):
-        child_data = os.read(r_pipe, 5096)
+        self.er_pipe = None
+        self.ew_pipe = None
+        self.ir_pipe = None
+        self.iw_pipe = None
+ 
+    def monitor(self, stdin):
+        os.write(self.iw_pipe, stdin)
+        child_data = os.read(self.er_pipe, 5096)
         if(child_data):
             # Child threw error
             print(child_data) 
-        os.close(r_pipe)
+        os.close(self.er_pipe)
 
-    def spawn_child(self, stdout, w_pipe):
+    def spawn_child(self, stdout):
         # Handle actual process creation
 
         # Tracee should call TRACEME
         ptrace.ptrace_traceme()
+        
+        # Point pipe to stdin
+        os.dup2(self.ir_pipe, 0)
 
         # If we don't want STDOUT, dup2 the FDs to point to devnull  
         if not stdout:  
             with open(os.devnull, "wb") as devnull:
                 os.dup2(devnull.fileno(), 1)
                 os.dup2(1, 2) 
+        
+    
         try:
-            os.execv(self.binary, self.arguments)  
+            if self.arguments != []:
+                os.execv(self.binary, self.arguments)  
+            else:
+                os.execv(self.binary, [" "])
         except: 
             # Error occured - write to parent. 
-            os.write(w_pipe, sys.exc_info())
+            os.write(self.ew_pipe, sys.exc_info())
 
-        os.close(w_pipe)
+        os.close(self.ew_pipe)
             
-    def spawn_process(self,stdout=True):
+    def spawn_process(self, stdout=True, stdin=b""):
+        """
+        Parameters:
+            stdin: Byte string that is initially sent to stdin of child.
+        """
         # Fork overhead in python3? 
         # Might want to migrate this out to a shared lib.
 
         # Note that we copy over our current environment. 
         # Might want to tweak this later. 
 
-        # Setup pipe and fork. 
-        r_pipe, w_pipe = os.pipe()
+        # Two pipes; child writes errors to parent.
+        # Parent writes input to child. 
+        self.er_pipe, self.ew_pipe = os.pipe()
+        self.ir_pipe, self.iw_pipe = os.pipe() 
+
+        # Fork 
         pid = os.fork()
 
-        
+         
         if pid: 
             # Parent
-            os.close(w_pipe)
-            self.monitor(pid, r_pipe)
+            os.close(self.ew_pipe)
+            os.close(self.ir_pipe)
+
             self.pid = pid 
+            self.monitor(stdin)
             return pid  
         else:
-            os.close(r_pipe)
-            self.spawn_child(stdout, w_pipe)
-    
+            os.close(self.er_pipe)
+            os.close(self.iw_pipe)
+
+            self.spawn_child(stdout)
+          
     """
-    Functions to handle ptrace business. 
+    Functions to interact with traced process..
     """
 
     def cont(self):
         ptrace.ptrace_continue(self.pid)
+
+    def wait(self):
+        # While being traced, the child will stop each time it gets a signal.
+        # Parent will be notified at next call to waitpid.
+        os.waitpid(self.pid)
+    
+    def send(self, stdin):
+        os.write(self.iw_pipe, stdin)
