@@ -50,9 +50,9 @@ class Harness:
     
         try:
             if self.arguments != []:
-                os.execv(self.binary, self.arguments)  
+                os.execl(self.binary, self.arguments)  
             else:
-                os.execv(self.binary, [" "])
+                os.execl(self.binary, [" "])
         except: 
             # Error occured - write to parent. 
             os.write(self.ew_pipe, sys.exc_info())
