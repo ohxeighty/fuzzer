@@ -3,7 +3,11 @@ from mutator import Mutator
 from parser import SampleParser
 from argparse import ArgumentParser
 from os.path import isfile
+import os 
 from sys import exit, argv
+import time 
+import ptrace 
+import signal
 
 """
 So this is what I think our code flow should look like:
@@ -73,5 +77,5 @@ if __name__ == '__main__':
     elif not isfile(args.sample):
         print('"{}" not found!'.format(args.sample))
         exit(-1)
-    
+        
     fuzz(args.binary, args.sample)

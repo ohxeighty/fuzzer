@@ -4,20 +4,33 @@ import os
 
 """
 Ptrace bindings. 
+Note that the constants are pulled from my machine (Linux). 
+Should match deployment machine.
+In theory we could dynamically populate them, but its a lot of work.
 """
 
-PTRACE_TRACEME	  = 0
-PTRACE_PEEKTEXT   = 1
-PTRACE_PEEKDATA   = 2
-PTRACE_POKETEXT   = 4
-PTRACE_POKEDATA   = 5
-PTRACE_CONT		  = 7
-PTRACE_KILL		  = 8
-PTRACE_SINGLESTEP = 9
-PTRACE_GETREGS	  = 12
-PTRACE_SETREGS	  = 13
-PTRACE_ATTACH	  = 16
-PTRACE_DETACH	  = 17
+PTRACE_TRACEME	  = 0x0
+PTRACE_PEEKTEXT   = 0x1
+PTRACE_PEEKDATA   = 0x2
+PTRACE_POKETEXT   = 0x4
+PTRACE_POKEDATA   = 0x5
+PTRACE_CONT		  = 0x7
+PTRACE_KILL		  = 0x8
+PTRACE_SINGLESTEP = 0x9
+PTRACE_GETREGS	  = 0xC
+PTRACE_SETREGS	  = 0xD
+PTRACE_ATTACH	  = 0x10
+PTRACE_DETACH	  = 0x11
+PTRACE_SETOPTIONS = 0x4200
+
+# Options
+PTRACE_O_TRACESYSGOOD = 0x00000001
+PTRACE_O_TRACEFORK = 0x00000002
+PTRACE_O_TRACEVFORK = 0x00000004
+PTRACE_O_TRACECLONE = 0x00000008
+PTRACE_O_TRACEEXEC = 0x00000010
+PTRACE_O_TRACEVFORKDONE = 0x00000020
+PTRACE_O_TRACEEXIT = 0x00000040
 
 libc = ctypes.CDLL('/lib/x86_64-linux-gnu/libc.so.6')
 libc.ptrace.argtypes = [ctypes.c_uint64, ctypes.c_uint64, ctypes.c_void_p, ctypes.c_void_p]
@@ -39,3 +52,10 @@ def ptrace_attach(pid):
 def ptrace_continue(pid, signal=0):
 	# If data != 0, it is the number of a signal to be delivered to tracee
 	libc.ptrace(PTRACE_CONT, pid, 0, signal)
+
+def ptrace_setoptions(pid, options):
+	for option in options:
+		libc.ptrace(PTRACE_SETOPTIONS, pid, 0, option)
+
+def ptrace_singlestep(pid):
+	libc.ptrace(PTRACE_SINGLESTEP, pid, 0, 0)
