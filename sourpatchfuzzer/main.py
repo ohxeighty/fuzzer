@@ -41,7 +41,7 @@ def fuzz(binary, sample):
     pid, status = prog.spawn_process()
     prog.cont()
 
-    prog.send(stdin) 
+    prog.send(sample_processed.data) 
 
     # simulate EOF 
     prog.close_input() 
@@ -58,8 +58,8 @@ def fuzz(binary, sample):
             # fuzzing engine. 
             print("Input crashed program with signal: {}".format(os.WSTOPSIG(status)))
             return
-		elif(os.WIFEXITED(status)):
-			return
+        elif(os.WIFEXITED(status)):
+            return
         prog.cont()
 
 
