@@ -1,7 +1,6 @@
 import harness
 from mutator import Mutator
 from parser import SampleParser
-<<<<<<< HEAD
 from argparse import ArgumentParser
 from os.path import isfile
 from sys import exit, argv
@@ -32,10 +31,32 @@ def fuzz(binary, sample):
 
     # how pass input into harness ?
 
-    binls = harness.Harness(binary, sample) # not how this works - pls fix
-    binls.spawn_process()
-    binls.cont()
-    binls.send(b"{}")
+    prog = harness.Harness(binary)
+
+    # The spawned process should be stopped.  
+    pid, status = prog.spawn_process()
+    prog.cont()
+
+    prog.send(stdin) 
+
+    # simulate EOF 
+    prog.close_input() 
+    # why in the everloving fuck does RESIZING A TERMINAL alter the behaviour of waitpid ????????
+    # sigwinch. thats why. 
+
+    while(1):
+        # sigsegv doesn't count as a termination signal.
+        # since it gets caught by ptrace (only sigkill goes through ptrace) 
+        # WSTOPSIG == 11 == SIGSEGV -> segfault
+        pid, status = prog.wait()
+        if(os.WIFSTOPPED(status) and (os.WSTOPSIG(status) == signal.SIGSEGV)):
+            # Placeholder -> Need to create file with crash input and integrate 
+            # fuzzing engine. 
+            print("Input crashed program with signal: {}".format(os.WSTOPSIG(status)))
+            return
+		elif(os.WIFEXITED(status)):
+			return
+        prog.cont()
 
 
 
