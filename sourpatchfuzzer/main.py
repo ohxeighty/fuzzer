@@ -1,4 +1,5 @@
 import harness
+<<<<<<< HEAD
 from argparse import ArgumentParser
 from os.path import isfile
 from sys import exit, argv
