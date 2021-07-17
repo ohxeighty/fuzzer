@@ -1,4 +1,6 @@
 import harness
+from mutator import Mutator
+from parser import SampleParser
 <<<<<<< HEAD
 from argparse import ArgumentParser
 from os.path import isfile
@@ -22,6 +24,14 @@ So this is what I think our code flow should look like:
     2 might be necessary for more complicated fuzzing techniques
 """
 def fuzz(binary, sample):
+    sample_processed = SampleParser(sample)
+    mutations = Mutator(sample_processed, min=2, max=10)
+    # can pass this as data:
+    # mutations.generate_mutation
+    # or run generate_mutation for several iterations, and pass in mutations.population, a list of mutated inputs
+
+    # how pass input into harness ?
+
     binls = harness.Harness(binary, sample) # not how this works - pls fix
     binls.spawn_process()
     binls.cont()
