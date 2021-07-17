@@ -8,7 +8,7 @@ class Mutator:
     Do we pass in input here, or provide the input to the harness? Ideally we want to be able to tell this class coverage information for better pop development
     """
 
-    def __init__(self, min=2, max=10, sample):
+    def __init__(self, sample, min=2, max=10):
         self.population = sample
         self.min = min
         self.max = max
@@ -18,7 +18,14 @@ class Mutator:
         self.population.append(pop)
         return
         
-    def mut_fuzz(self):
+    def print_population(self):
+        print(self.population)
+        return
+
+    def generate_mutation(self):
+        """
+        Mutator.generate_mutation will spit out a mutated version of a random pop, then add it to the population. In the future: change the behaviour to add a population if coverage detects more branches.
+        """
         # take a random base in our population
         candidate = choice(self.population)
         trials = randint(self.min, self.max) # fuzz random amount of times
@@ -29,7 +36,8 @@ class Mutator:
         # return candidate
         # add_pop(candidate)
         # test for coverage, if it goes deeper, then add to population
-    
+        self.add_pop(candidate)
+        return candidate 
     #
 
     # ===================================================================
@@ -57,7 +65,7 @@ class Mutator:
         return s[:pos]+new+s[pos+1:]
 
     def mutate(self, s):
-        mutators = [insert_random, delete_random, flip_random_bit]
+        mutators = [self.insert_random, self.delete_random, self.flip_random_bit]
         pick = choice(mutators)
         return pick(s)
 
