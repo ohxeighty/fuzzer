@@ -47,6 +47,7 @@ def fuzz(binary, sample):
         # in future, call parent method -> give me a mutation.. 
         current_input = mutations.json_mutate()
 
+        print(current_input)
         prog = harness.Harness(binary)
         # The spawned process should be stopped.  
         pid, status = prog.spawn_process(stdout=False)
