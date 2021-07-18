@@ -83,7 +83,7 @@ class CsvMutator:
         bit = 1<<randint(0,6)
         new = chr(ord(c)^bit)
         return s[:pos]+new+s[pos+1:]
-
+    # ==================================================================
     def field_single_mutate(self):
         mutated_list = self.csv_list.copy()
         rand_row = randrange(0, len(self.csv_list)) 
