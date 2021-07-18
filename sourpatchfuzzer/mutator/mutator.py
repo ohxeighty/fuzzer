@@ -1,4 +1,5 @@
 from random import randint, randrange, choice
+import parser
 
 class Mutator:
     """

@@ -1,5 +1,7 @@
+#!/bin/python3
+
 import harness
-from mutator import Mutator
+from mutator import Mutator, JsonMutator
 from parser import SampleParser
 from argparse import ArgumentParser
 from os.path import isfile
@@ -28,39 +30,50 @@ So this is what I think our code flow should look like:
 """
 def fuzz(binary, sample):
     sample_processed = SampleParser(sample)
-    mutations = Mutator(sample_processed, min=2, max=10)
+
+    # PLACEHOLDER
+    # Check magic bytes -> make best guess for input format
+    # This should be moved into mutation logic -> this is a shortcut for midpoint
+    mutations = JsonMutator(sample_processed.data, min=2, max=10)
+
     # can pass this as data:
     # mutations.generate_mutation
     # or run generate_mutation for several iterations, and pass in mutations.population, a list of mutated inputs
-
-    # how pass input into harness ?
-
-    prog = harness.Harness(binary)
-
-    # The spawned process should be stopped.  
-    pid, status = prog.spawn_process()
-    prog.cont()
-
-    prog.send(sample_processed.data) 
-
-    # simulate EOF 
-    prog.close_input() 
-    # why in the everloving fuck does RESIZING A TERMINAL alter the behaviour of waitpid ????????
-    # sigwinch. thats why. 
-
+ 
+    # Loop for whole timelimit 
+    # In future - try multiple strategies in time limit
     while(1):
-        # sigsegv doesn't count as a termination signal.
-        # since it gets caught by ptrace (only sigkill goes through ptrace) 
-        # WSTOPSIG == 11 == SIGSEGV -> segfault
-        pid, status = prog.wait()
-        if(os.WIFSTOPPED(status) and (os.WSTOPSIG(status) == signal.SIGSEGV)):
-            # Placeholder -> Need to create file with crash input and integrate 
-            # fuzzing engine. 
-            print("Input crashed program with signal: {}".format(os.WSTOPSIG(status)))
-            return
-        elif(os.WIFEXITED(status)):
-            return
+
+        # in future, call parent method -> give me a mutation.. 
+        current_input = mutations.json_mutate()
+
+        prog = harness.Harness(binary)
+        # The spawned process should be stopped.  
+        pid, status = prog.spawn_process(stdout=False)
         prog.cont()
+
+        prog.send(current_input) 
+
+        # simulate EOF 
+        prog.close_input() 
+        # why in the everloving fuck does RESIZING A TERMINAL alter the behaviour of waitpid ????????
+        # sigwinch. thats why. 
+
+        while(1):
+            # sigsegv doesn't count as a termination signal.
+            # since it gets caught by ptrace (only sigkill goes through ptrace) 
+            # WSTOPSIG == 11 == SIGSEGV -> segfault
+            pid, status = prog.wait()
+            if(os.WIFSTOPPED(status) and (os.WSTOPSIG(status) == signal.SIGSEGV)):
+                # Placeholder -> Need to create file with crash input and integrate 
+                # fuzzing engine. 
+                print("Input crashed program with signal: {}".format(os.WSTOPSIG(status)))
+                with open("bad.txt", "ab+") as f:
+                    f.write(current_input + b"\n")
+                break
+            elif(os.WIFEXITED(status)):
+                break
+            prog.cont()
 
 
 
