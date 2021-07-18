@@ -3,24 +3,33 @@
 Currently, our fuzzer is capable of:
 - fuzzing json inputs using basic mutation strategies, including:
 	- setting fields to NULL
-	- replacing fields with large numbers
+	- replacing fields with large numbers and random strings
 	- swapping data types in fields
 - fuzzing csv inputs (hopefully) using basic mutation strategies, including:
-	- mutate single fields
-	- add rows
+	- mutating rows with garbage
+	- adding garbage rows 
 - and generally, mutating inputs in these fashions:
 	- removing bytes
 	- adding bytes
 	- flipping bits in bytes
+
 ## Design
 Our fuzzer is composed of several major components:
-- harness: handles loading, i/o and crash management
+- harness: handles loading, i/o and signal/crash management
 - mutator: takes in input from the parser and mutates it to create possibly adversarial input for the harness
-As of currently, each format has its own subclass mutator which handles parsing samples into fields and mutating individual fields. There is no coverage measurement yet.
+As of now, each format has its own subclass mutator which handles parsing samples into fields and mutating individual fields. There is no coverage measurement yet.
+
+See the `docs` directory for future design notes (current baseline plan is evolutionary fuzzer with code coverage serving as the natural selection metric). 
+
+Most of the existing code is boilerplate PoC that needs to be refactored into consistent classes & methods. 
+
 ### Harness
-Our harness uses ptrace to trace the target binary and watch for crashes. 
-The harness initialises two pipes: one pipe sends data into STDIN and the other pipe is used to communicate errors/crashes back up to the harness.
-Binaries are executed by initially loading the binary, then forking to run our mutated input. 
+Our custom harness uses ptrace (pulled from libc @ assumed path `/lib/x86_64-linux-gnu/libc.so.6`) to trace the target binary and watch for signals (including crashes). In future, this will enable fine tuned interrogation of the target binary and code coverage feedback (i.e. typical "debugger" capabilities implemented with ptrace methods).  
+
+The target binary is spawned under a child process with fork + exec.
+
+Two pipes are created for IO: one pipe sends data from the harness into STDIN and the other pipe is used to communicate errors/crashes (when spawning) back up to the harness.
+
 ### Mutators
 - The JSON mutator disassembles the sample input using a json library into fields
 - Each field is individually and randomly mutated depending on what type of data the field is
@@ -32,7 +41,7 @@ Binaries are executed by initially loading the binary, then forking to run our m
 	- Manipulate an integer up or down randomly
 
 - The CSV mutator disassembles the sample input using a csv library into fields
-- Each field is individually and randomly mutated before being repacked by csv
+- Each field may be randomly mutated before being repacked
 The possible mutations are:
 	- Mutate a random field generally
 	- Append new rows of random strings
