@@ -1,4 +1,4 @@
-from random import randint, randrange, choice, randbytes
+from random import randint, randrange, choice
 import string
 import parser
 import csv
