@@ -1,7 +1,7 @@
 #!/bin/python3
 
 import harness
-from mutator import Mutator, JsonMutator
+from mutator import Mutator, JsonMutator, CsvMutator
 from parser import SampleParser
 from argparse import ArgumentParser
 from os.path import isfile
@@ -29,12 +29,20 @@ So this is what I think our code flow should look like:
     2 might be necessary for more complicated fuzzing techniques
 """
 def fuzz(binary, sample):
-    sample_processed = SampleParser(sample)
 
     # PLACEHOLDER
-    # Check magic bytes -> make best guess for input format
+    # Check magic bytes / struct of sample input -> make best guess for input format
     # This should be moved into mutation logic -> this is a shortcut for midpoint
-    mutations = JsonMutator(sample_processed.data, min=2, max=10)
+    try:
+        # move to mutator later
+        sample_processed = SampleParser(sample)
+        mutations = JsonMutator(sample_processed.data, min=2, max=10)
+    except:
+        # midpoint, csv
+        mutations = CsvMutator(sample, min=2, max=10)
+
+    
+
 
     # can pass this as data:
     # mutations.generate_mutation
@@ -45,12 +53,12 @@ def fuzz(binary, sample):
     while(1):
 
         # in future, call parent method -> give me a mutation.. 
-        current_input = mutations.json_mutate()
+        current_input = mutations.single_mutate()
 
         print(current_input)
         prog = harness.Harness(binary)
         # The spawned process should be stopped.  
-        pid, status = prog.spawn_process(stdout=False)
+        pid, status = prog.spawn_process(stdout=True)
         prog.cont()
 
         prog.send(current_input) 
@@ -70,7 +78,9 @@ def fuzz(binary, sample):
                 # fuzzing engine. 
                 print("Input crashed program with signal: {}".format(os.WSTOPSIG(status)))
                 with open("bad.txt", "ab+") as f:
-                    f.write(current_input + b"\n")
+                    # write the byte string
+                    # since most formats have newlines in them
+                    f.write(str(current_input).encode("unicode-escape") + b"\n")
                 break
             elif(os.WIFEXITED(status)):
                 break
