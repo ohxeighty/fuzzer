@@ -101,5 +101,9 @@ if __name__ == '__main__':
     elif not isfile(args.sample):
         print('"{}" not found!'.format(args.sample))
         exit(-1)
-        
+    
+    # enforce absolute
+    args.binary = os.path.abspath(args.binary)
+    args.sample = os.path.abspath(args.sample)
+
     fuzz(args.binary, args.sample)

@@ -84,7 +84,7 @@ class CsvMutator:
         new = chr(ord(c)^bit)
         return s[:pos]+new+s[pos+1:]
 
-    def field_single_mutate(self, s):
+    def field_single_mutate(self):
         mutated_list = self.csv_list.copy()
         rand_row = randrange(0, len(self.csv_list)) 
         rand_key = choice(self.csv_headers)
@@ -123,7 +123,6 @@ class CsvMutator:
     def single_mutate(self):
 
         mutators = [self.field_random_row, self.field_append_rows, self.field_single_mutate]
-        mutators = [self.field_append_rows] 
 
         mutated_list = choice(mutators)()
         return self.csv_write(mutated_list)
