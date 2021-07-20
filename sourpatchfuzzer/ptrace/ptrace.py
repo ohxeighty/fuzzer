@@ -1,4 +1,4 @@
-import ctypes
+import ctypes, ctypes.util
 import sys
 import os 
 
@@ -32,7 +32,7 @@ PTRACE_O_TRACEEXEC = 0x00000010
 PTRACE_O_TRACEVFORKDONE = 0x00000020
 PTRACE_O_TRACEEXIT = 0x00000040
 
-libc = ctypes.CDLL('/lib/x86_64-linux-gnu/libc.so.6')
+libc = ctypes.CDLL(ctypes.util.find_library("c"))
 libc.ptrace.argtypes = [ctypes.c_uint64, ctypes.c_uint64, ctypes.c_void_p, ctypes.c_void_p]
 libc.ptrace.restype = ctypes.c_uint64
 
