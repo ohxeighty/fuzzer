@@ -9,8 +9,8 @@ class Mutator:
     Do we pass in input here, or provide the input to the harness? Ideally we want to be able to tell this class coverage information for better pop development
     """
 
-    def __init__(self, sample, min=2, max=10):
-        self.population = sample
+    def __init__(self, min=2, max=10):
+        self.population = []
         self.min = min
         self.max = max
         return

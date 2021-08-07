@@ -8,7 +8,8 @@ class SampleParser:
         with open(sample, "rb") as f:
             self.sample = sample
             self.data = f.read()
-            self.guess = magic.from_buffer(self.data)
+            self.guess = magic.from_buffer(self.data) # TODO: Add our own magic database, in case adam decides to screw with his magic database
+
         # for now, store everything in bulk in sample_data
         # in the future, we want to be able to break up our sample data into more useful information to pass to other modules
         # e.g. grab headers, determine data type (if we want to hardcode fuzzing options for input like xml)

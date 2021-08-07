@@ -44,7 +44,7 @@ def fuzz(binary, sample):
     # CSV text: csv
     # HTML document, ASCII text: xml2
 
-        mutations = {
+        mutations = { # walmart switch statement
             'JSON data' : lambda sample_processed:JsonMutator(sample_processed.data, min=2, max=10),
             'CSV text': lambda sample_processed:CsvMutator(sample_processed.csv(), min=2, max=10)
             }[sample_processed.guess](sample_processed)

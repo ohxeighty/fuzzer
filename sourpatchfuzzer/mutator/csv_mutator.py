@@ -2,87 +2,29 @@ from random import randint, randrange, choice
 import string
 import parser
 import csv
+import mutator
 
 # MAKE REPRODUCIBLE -> DUMP RAND SEED 
 
 # When we have time -> extend into object oriented
 # parent vanilla mutator
 
-class CsvMutator:
+class CsvMutator(mutator.Mutator):
     """
     Mutator(min, max, sample input)
     creates a list Mutator.population of mutated inputs to be passed into the binary
     
     Do we pass in input here, or provide the input to the harness? Ideally we want to be able to tell this class coverage information for better pop development
     """
-
-    def process_csv(self, s):
-        with open(s, newline="") as f:
-            reader = csv.DictReader(f)
-            return [rows for rows in reader]
-
     def __init__(self, sample_processed, min=2, max=10): 
         # By convention, header is the first row 
         self.csv_list = sample_processed 
         self.csv_headers = list(self.csv_list[0].keys())
-        self.min = min
-        self.max = max
-        self.population = []
-        
         self.newline = "\n"
         self.delimiter = ","
+        mutator.Mutator.__init__(self,min,max)
         return
 
-
-    def add_pop(self, pop):
-        self.population.append(pop)
-        return
-        
-    def print_population(self):
-        print(self.population)
-        return
-
-    def generate_mutation(self):
-        """
-        Mutator.generate_mutation will spit out a mutated version of a random pop, then add it to the population. In the future: change the behaviour to add a population if coverage detects more branches.
-        """
-        # take a random base in our population
-        candidate = choice(self.population)
-        trials = randint(self.min, self.max) # fuzz random amount of times
-        for i in range(trials):
-            candidate = self.mutate(candidate)
-
-        # TODO: couple of options here: 
-        # return candidate
-        # add_pop(candidate)
-        # test for coverage, if it goes deeper, then add to population
-        self.add_pop(candidate)
-        return candidate 
-    #
-
-    # ===================================================================
-    # list of mutations:
-    # All of these mutations are from the fuzzing book
-    # see: https://www.fuzzingbook.org/html/MutationFuzzer.html
-    def insert_random(self, s):
-        pos = randint(0, len(s))
-        randchar = chr(randrange(32,127))
-        return s[:pos] + randchar + s[pos:]
-
-    def delete_random(self, s):
-        if s == "":
-            return s
-        pos = randint(0, len(s)-1)
-        return s[:pos]+s[pos+1:]
-
-    def flip_random_bit(self, s):
-        if s=="":
-            return s
-        pos = randint(0, len(s)-1)
-        c = s[pos]
-        bit = 1<<randint(0,6)
-        new = chr(ord(c)^bit)
-        return s[:pos]+new+s[pos+1:]
     # ==================================================================
     def field_single_mutate(self):
         mutated_list = self.csv_list.copy()
