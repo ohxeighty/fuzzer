@@ -4,6 +4,10 @@ import os
 import signal
 import ptrace
 
+# big fat chunky angr
+# if bothered, please just pull the logic we need for creating our BBV
+import angr
+
 class Harness:
     """
     Binary harness. 
@@ -36,10 +40,21 @@ class Harness:
         self.ir_pipe = None
         self.iw_pipe = None
         
-        # our hashmap of addresses -> original instruction 
-        # that keeps track of our breakpoints
-        self.breakpoints = dict() 
+        ## our hashmap of addresses -> original instruction 
+        ## that keeps track of our breakpoints
+        #self.breakpoints = dict() 
 
+        ## hokay, now we use angr to extract our basic block vector which we use for code coverage
+        #self.angr_project = angr.Project(binary, auto_load_libs=False)
+        ## create networkx control flow graph
+        #self.cfg = self.angr_project.analyses.CFGFast()
+        #self.cfg.normalize()
+        #
+        #self.bbv = []
+        #for node in self.cfg.functions.values():
+        #    # internals
+        #    if not node.name.startswith("__"):
+        #        self.bbv += node.blocks
     def monitor(self):
         #child_data = os.read(self.er_pipe, 5096)
         

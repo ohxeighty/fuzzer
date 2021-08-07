@@ -32,6 +32,13 @@ So this is what I think our code flow should look like:
 """
 def fuzz(binary, sample, verbose):
 
+    """
+    block based code coverage? edge coverage is hard and requires actual... algorithms (and source)
+    and if we got X amount of time without new coverage, we start from scratch? (bandaid 
+    fix for when we get a bad evolution path...) 
+
+    I'm fairly certain using ANGR's factory module to grab a basic block vector is within the DIY scope. 
+    """
     # PLACEHOLDER
     # Check magic bytes / struct of sample input -> make best guess for input format
     # This should be moved into mutation logic -> this is a shortcut for midpoint
@@ -64,6 +71,7 @@ def fuzz(binary, sample, verbose):
     
     # Loop for whole timelimit 
     # In future - try multiple strategies in time limit
+    prog = harness.Harness(binary)
     while(1):
 
         # in future, call parent method -> give me a mutation.. 
@@ -76,7 +84,7 @@ def fuzz(binary, sample, verbose):
 
         prog = harness.Harness(binary)
         # The spawned process should be stopped.  
-        pid, status = prog.spawn_process(stdout=True)
+        pid, status = prog.spawn_process(stdout=False)
         prog.cont()
 
         prog.send(current_input) 
