@@ -60,12 +60,18 @@ def fuzz(binary, sample):
     # mutations.generate_mutation
     # or run generate_mutation for several iterations, and pass in mutations.population, a list of mutated inputs
  
+    # Some inkling of a strategy handler
+    if hasattr(mutations, 'complex_mutate'):
+        strategy = mutations.complex_mutate
+    else:
+        strategy = mutations.single_mutate
     # Loop for whole timelimit 
     # In future - try multiple strategies in time limit
     while(1):
 
         # in future, call parent method -> give me a mutation.. 
-        current_input = mutations.single_mutate()
+        
+        current_input = strategy()
 
         print(current_input)
         prog = harness.Harness(binary)
