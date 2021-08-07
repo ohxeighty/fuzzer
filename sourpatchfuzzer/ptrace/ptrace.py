@@ -34,7 +34,18 @@ PTRACE_O_TRACEEXIT = 0x00000040
 
 libc = ctypes.CDLL(ctypes.util.find_library("c"))
 libc.ptrace.argtypes = [ctypes.c_uint64, ctypes.c_uint64, ctypes.c_void_p, ctypes.c_void_p]
+# long long unsigned
 libc.ptrace.restype = ctypes.c_uint64
+
+# argtypes for persona 
+libc.syscall.argtypes = [ctypes.c_long, ctypes.c_ulong]
+libc.syscall.restype = ctypes.c_int
+# also export method for personality
+# if bothered move this out later
+# see /usr/include/sys/personality.h -> ADDR_NO_RANDOMIZE = 0x40000
+# sys_personality = 135 
+def personality_disable_aslr():
+    libc.syscall(135, 0x40000)
 
 # man ptrace
 # long ptrace(enum __ptrace_request request, pid_t pid, void *addr, void *data);
@@ -59,3 +70,9 @@ def ptrace_setoptions(pid, options):
 
 def ptrace_singlestep(pid):
 	libc.ptrace(PTRACE_SINGLESTEP, pid, 0, 0)
+
+def ptrace_peek(pid, addr):
+    return libc.ptrace(PTRACE_PEEKTEXT, pid, addr, 0)
+
+def ptrace_poke(pid, addr, data):
+    libc.ptrace(PTRACE_POKETEXT, pid, addr, data)
