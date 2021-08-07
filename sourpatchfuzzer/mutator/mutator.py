@@ -47,7 +47,10 @@ class Mutator:
     # see: https://www.fuzzingbook.org/html/MutationFuzzer.html
     def insert_random(self, s):
         pos = randint(0, len(s))
-        randchar = chr(randrange(32,127))
+        if isinstance(s, str):
+            randchar = chr(randrange(32,127))
+        else:
+            randchar = bytes(randrange(32,127))
         return s[:pos] + randchar + s[pos:]
 
     def delete_random(self, s):
@@ -62,10 +65,13 @@ class Mutator:
         pos = randint(0, len(s)-1)
         c = s[pos]
         bit = 1<<randint(0,6)
-        new = chr(ord(c)^bit)
+        if isinstance(s, str):
+            new = chr(ord(c)^bit)
+        else:
+            new = bytes(c^bit)
         return s[:pos]+new+s[pos+1:]
 
-    def mutate(self, s):
+    def mutate(self, s): # Expects a bytestring or string
         mutators = [self.insert_random, self.delete_random, self.flip_random_bit]
         pick = choice(mutators)
         return pick(s)

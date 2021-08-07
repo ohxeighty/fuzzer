@@ -30,9 +30,8 @@ class CsvMutator(mutator.Mutator):
         mutated_list = self.csv_list.copy()
         rand_row = randrange(0, len(self.csv_list)) 
         rand_key = choice(self.csv_headers)
-        mutators = [self.insert_random, self.delete_random, self.flip_random_bit]
-        
-        mutated_list[rand_row][rand_key] = choice(mutators)(self.csv_list[rand_row][rand_key])
+    
+        mutated_list[rand_row][rand_key] = self.mutate(self.csv_list[rand_row][rand_key])
         return mutated_list
         
 
