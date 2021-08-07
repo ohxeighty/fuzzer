@@ -50,7 +50,7 @@ def fuzz(binary, sample, verbose):
             }[sample_processed.guess](sample_processed)
     except KeyError as e:
         print('Unmatched data type: {}, defaulting to generic mutator'.format(e))
-        mutations = Mutator(sample_processed)
+        mutations = Mutator(sample_processed.data)
         # need a default: ascii
     except Exception as e:
         print("mutator fucked up: {}".format(e))
@@ -132,7 +132,7 @@ if __name__ == '__main__':
     args.sample = os.path.abspath(args.sample)
     
     # set a timer for 3 minutes
-    #signal.signal(signal.SIGALRM, timeout)
+    signal.signal(signal.SIGALRM, timeout)
     signal.alarm(TIME_LIMIT)
 
     fuzz(args.binary, args.sample, args.verbose)

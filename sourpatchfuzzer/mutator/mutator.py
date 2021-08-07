@@ -23,11 +23,20 @@ class Mutator:
 
     def single_mutate(self):
         output = self.data
-        tries = randint(min, max):
-            for i in range(0, tries):
-                output = mutate(output)
+        print(output)
+        tries = randint(self.min, self.max)
+        for i in range(0, tries):
+            output = self.mutate(output)
         return output
 
+    def complex_mutate(self, invalid_chance = 10):
+        output = self.single_mutate()
+        if randint(1,100) <= invalid_chance:
+            return randint(-100, 100)
+        if randint(1,100) <= invalid_chance:
+            complex = choice([self.duplicate])
+            return complex(output)
+        return output
 
 
     # ====================================================== 
@@ -40,8 +49,8 @@ class Mutator:
             randchar = choice(special)
         return s[:pos] + randchar + s[pos:]       
 
-
-
+    def duplicate(self, s):
+        return s*100
     
     # Population controls:
 
