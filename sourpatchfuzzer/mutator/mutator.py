@@ -32,9 +32,7 @@ class Mutator:
     def complex_mutate(self, invalid_chance = 10):
         output = self.single_mutate()
         if randint(1,100) <= invalid_chance:
-            return randint(-100, 100)
-        if randint(1,100) <= invalid_chance:
-            complex = choice([self.duplicate])
+            complex = choice([self.duplicate, self.insert_special])
             return complex(output)
         return output
 
@@ -84,7 +82,10 @@ class Mutator:
     # All of these mutations are modified from the fuzzing book
     # see: https://www.fuzzingbook.org/html/MutationFuzzer.html
     def insert_random(self, s):
-        pos = randint(0, len(s))
+        pos = 0
+        if len(s) >= 2 :
+            pos = randint(0, len(s)-1)
+
         if isinstance(s, str):
             randchar = chr(randrange(32,127))
         else:
@@ -92,15 +93,17 @@ class Mutator:
         return s[:pos] + randchar + s[pos:]
 
     def delete_random(self, s):
-        if s == "":
-            return s
-        pos = randint(0, len(s)-1)
-        return s[:pos]+s[pos+1:]
+        if len(s) >= 2 :
+            pos = randint(0, len(s)-1)
+            return s[:pos]+s[pos+1:]
+        return s
 
     def flip_random_bit(self, s):
-        if s=="":
+        if s=="" or s ==b'':
             return s
-        pos = randint(0, len(s)-1)
+        pos = 0
+        if len(s) >= 2 :
+            pos = randint(0, len(s)-1)
         c = s[pos]
         bit = 1<<randint(0,6)
         if isinstance(s, str):
@@ -110,6 +113,6 @@ class Mutator:
         return s[:pos]+new+s[pos+1:]
 
     def mutate(self, s): # Expects a bytestring or string
-        mutators = [self.insert_random, self.delete_random, self.flip_random_bit, self.insert_special]
+        mutators = [self.insert_random, self.delete_random, self.flip_random_bit]
         pick = choice(mutators)
         return pick(s)

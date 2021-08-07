@@ -5,7 +5,7 @@ class Jpg:
         self.positions = []
         self.headers = []
         self.lengths = []
-        self.datas = []
+        self.datas = [] # the plural is data, the singular is datum
         i = 0
         jpg_magic = [b'\xd0', b'\xd1', b'\xd2', b'\xd3', b'\xd4', b'\xd5', b'\xd6', b'\xd7', b'\xd8', b'\xd9']
         while(i != -1):

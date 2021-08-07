@@ -40,10 +40,17 @@ class JsonMutator(mutator.Mutator):
         mutated_json[rand_key] = choice(mutators)(self.json_dict[rand_key])
         return json.dumps(mutated_json).encode("utf-8")
 
-    def complex_mutate(self, invalid_chance = 10):
+    def complex_mutate(self, invalid_chance = 40):
     # We should try things in 2 stages: mutating fields, then mutating structure
-        if randint(1, 100) <= invalid_chance: # chance to invalidate. 10% by default
+        tries = randint(self.min, self.max)
+        for i in range(0, tries):
+            self.json_dict = json.loads(self.single_mutate())
+        if randint(1, 100) <= invalid_chance: # chance to invalidate. 40% by default
             decomposed = self.single_mutate().split(b',')
+
+            randfield = randint(0, len(decomposed)-1)
+            for i in range(0, tries):
+                decomposed = self.invalidator(decomposed)
             return b','.join(self.invalidator(decomposed))
         else:
             return self.single_mutate()

@@ -2,6 +2,8 @@ import sys
 import os
 import magic
 import csv
+import xml.etree.ElementTree as ET
+import parser.jpg as jpg
 
 class SampleParser:
     def __init__(self, sample):
@@ -9,7 +11,15 @@ class SampleParser:
             self.sample = sample
             self.data = f.read()
             mage = magic.Magic(magic_file="parser/magic.mgc")
-            self.guess = mage.from_buffer(self.data) 
+            self.guess = mage.from_buffer(self.data)
+            if "JFIF" in self.guess:
+                self.guess = "JFIF"
+            elif "JSON" in self.guess:
+                self.guess = "JSON"
+            elif "CSV" in self.guess:
+                self.guess = "CSV"
+            elif "XML" in self.guess:
+                self.guess = "XML"
 
         # for now, store everything in bulk in sample_data
         # in the future, we want to be able to break up our sample data into more useful information to pass to other modules
@@ -24,3 +34,11 @@ class SampleParser:
         with open(self.sample, newline="") as f:
             reader = csv.DictReader(f)
             return [rows for rows in reader]
+
+    def xml(self):
+        tree = ET.parse(self.sample)
+        return tree
+
+    def jpg(self):
+        dissected = jpg.Jpg(self.data)
+        return dissected

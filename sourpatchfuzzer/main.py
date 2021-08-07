@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import harness
-from mutator import Mutator, JsonMutator, CsvMutator
+from mutator import Mutator, JsonMutator, CsvMutator, JpgMutator
 from parser import SampleParser
 from argparse import ArgumentParser
 from os.path import isfile
@@ -45,8 +45,10 @@ def fuzz(binary, sample, verbose):
     # HTML document, ASCII text: xml2
 
         mutations = { # walmart switch statement
-            'JSON data' : lambda sample_processed:JsonMutator(sample_processed.data, min=2, max=10),
-            'CSV text': lambda sample_processed:CsvMutator(sample_processed.csv(), min=2, max=10)
+            'JSON' : lambda sample_processed:JsonMutator(sample_processed.data, min=2, max=10),
+            'CSV': lambda sample_processed:CsvMutator(sample_processed.csv(), min=2, max=10),
+            'JFIF': lambda sample_processed:JpgMutator(sample_processed.jpg(), min=2, max=10),
+            'XML': lambda sample_processed:XmlMutator(sample_processed.xml(), min=2, max=10)
             }[sample_processed.guess](sample_processed)
     except KeyError as e:
         print('Unmatched data type: {}, defaulting to generic mutator'.format(e))
@@ -57,11 +59,8 @@ def fuzz(binary, sample, verbose):
     
     print('Running fuzzer with a {} second limit...'.format(TIME_LIMIT))
 
-    # Some inkling of a strategy handler
-    if hasattr(mutations, 'complex_mutate'):
-        strategy = mutations.complex_mutate
-    else:
-        strategy = mutations.single_mutate
+    # nevermind
+    strategy = mutations.complex_mutate
     
     # Loop for whole timelimit 
     # In future - try multiple strategies in time limit
@@ -72,6 +71,7 @@ def fuzz(binary, sample, verbose):
         current_input = strategy()
 
         if verbose:
+            print(strategy)
             print(current_input)
 
         prog = harness.Harness(binary)
@@ -105,8 +105,9 @@ def fuzz(binary, sample, verbose):
 
 def timeout(num, stack):
     print("=========================================")
-    print("Time limit reached: {}".format(TIME_LIMIT))
-    print("You look nice today!")
+    print("Time limit reached: {} arbitrary time units".format(TIME_LIMIT))
+    print("Faulting inputs have been logged to bad.txt")
+    print("You look nice today :)")
     # We could put a neat summary here
     exit(0)
 
