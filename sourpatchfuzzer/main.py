@@ -79,16 +79,11 @@ def fuzz(binary, sample, verbose):
         
         current_input = strategy()
 
-<<<<<<< HEAD
         if verbose:
             print(strategy)
             print(current_input)
 
         prog = harness.Harness(binary)
-        # The spawned process should be stopped.  
-        pid, status = prog.spawn_process(stdout=False)
-        prog.cont()
-=======
         # Spawn process - should be stopped after exec. 
         pid, status = prog.spawn_process(stdout=True)
         prog.getregs()
@@ -97,7 +92,6 @@ def fuzz(binary, sample, verbose):
         # Now that the process has been spawned, we can populate the breakpoints
         prog.populate_breakpoints()
         prog.breakpoint_status()
->>>>>>> 69e7b27 (Holy fucking shit progress.)
 
         # Start the process proper 
         prog.cont()
@@ -168,12 +162,7 @@ if __name__ == '__main__':
     args.sample = os.path.abspath(args.sample)
     
     # set a timer for 3 minutes
-<<<<<<< HEAD
     signal.signal(signal.SIGALRM, timeout)
     signal.alarm(TIME_LIMIT)
-=======
-    #signal.signal(signal.SIGALRM, timeout)
-    #signal.alarm(TIME_LIMIT)
->>>>>>> 69e7b27 (Holy fucking shit progress.)
 
     fuzz(args.binary, args.sample, args.verbose)
