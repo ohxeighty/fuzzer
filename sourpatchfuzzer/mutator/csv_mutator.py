@@ -22,8 +22,19 @@ class CsvMutator(mutator.Mutator):
         self.csv_headers = list(self.csv_list[0].keys())
         self.newline = "\n"
         self.delimiter = ","
-        mutator.Mutator.__init__(self,min,max)
+        mutator.Mutator.__init__(self,None, min,max)
         return
+    # ===============================================================
+    # Filetype: csv
+    # Main strategies: single field mutation
+ 
+    # why did you have to call it single_mutate
+    def single_mutate(self):
+
+        mutators = [self.field_random_row, self.field_append_rows, self.field_single_mutate]
+
+        mutated_list = choice(mutators)()
+        return self.csv_write(mutated_list)
 
     # ==================================================================
     def field_single_mutate(self):
@@ -60,12 +71,6 @@ class CsvMutator(mutator.Mutator):
             formatted += self.newline + self.delimiter.join(row.values())
         return formatted.encode("utf-8")
         
-    # PLACEHOLDER -> SINGLE FIELD MUTATION
-    def single_mutate(self):
 
-        mutators = [self.field_random_row, self.field_append_rows, self.field_single_mutate]
-
-        mutated_list = choice(mutators)()
-        return self.csv_write(mutated_list)
 
 

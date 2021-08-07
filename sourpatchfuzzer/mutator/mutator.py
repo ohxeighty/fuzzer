@@ -9,11 +9,41 @@ class Mutator:
     Do we pass in input here, or provide the input to the harness? Ideally we want to be able to tell this class coverage information for better pop development
     """
 
-    def __init__(self, min=2, max=10):
+    def __init__(self, sample=None, min=2, max=10):
+        if sample is not None:
+            self.data = sample
         self.population = []
         self.min = min
         self.max = max
         return
+
+    # =====================================================
+    # Filetype: data/plaintext
+    # Main strategies: kitchen sink
+
+    def single_mutate(self):
+        output = self.data
+        tries = randint(min, max):
+            for i in range(0, tries):
+                output = mutate(output)
+        return output
+
+
+
+    # ====================================================== 
+    def insert_special(self, s):
+        special = [b'\0',b'\n',b'%p',b'%s',b'\r',b'\b',b'\t',b'\f',b'\\',b'\x7f']
+        pos = randint(0, len(s))
+        if isinstance(s, str):
+            randchar = chr(choice(special))
+        else:
+            randchar = choice(special)
+        return s[:pos] + randchar + s[pos:]       
+
+
+
+    
+    # Population controls:
 
     def add_pop(self, pop):
         self.population.append(pop)
@@ -39,11 +69,10 @@ class Mutator:
         # test for coverage, if it goes deeper, then add to population
         self.add_pop(candidate)
         return candidate 
-    #
 
     # ===================================================================
     # list of mutations:
-    # All of these mutations are from the fuzzing book
+    # All of these mutations are modified from the fuzzing book
     # see: https://www.fuzzingbook.org/html/MutationFuzzer.html
     def insert_random(self, s):
         pos = randint(0, len(s))
@@ -72,7 +101,6 @@ class Mutator:
         return s[:pos]+new+s[pos+1:]
 
     def mutate(self, s): # Expects a bytestring or string
-        mutators = [self.insert_random, self.delete_random, self.flip_random_bit]
+        mutators = [self.insert_random, self.delete_random, self.flip_random_bit, self.insert_special]
         pick = choice(mutators)
         return pick(s)
-

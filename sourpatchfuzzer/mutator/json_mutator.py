@@ -19,10 +19,37 @@ class JsonMutator(mutator.Mutator):
 
     def __init__(self, sample, min=2, max=10): 
         self.json_dict = json.loads(sample) 
-        mutator.Mutator.__init__(self, min, max)
+        mutator.Mutator.__init__(self, None, min, max)
         return
        # TEMPORARY
     
+    # ================================================================
+    # Filetype: JSON
+    # Main strategies: single field mutation, corrupting structure of input
+
+    def single_mutate(self):
+        rand_key = choice(list(self.json_dict.keys()))
+        mutated_json = self.json_dict.copy()
+        mutators = [self.field_null, self.field_large_int_random, self.field_rand_str]
+        # Try mutate based on type
+        if type(self.json_dict[rand_key]) == int:
+            mutators += [self.field_local_int_random, self.field_replace_int_with_str]
+        elif type(self.json_dict[rand_key]) == str:
+            mutators += [self.field_replace_str_with_int]
+
+        mutated_json[rand_key] = choice(mutators)(self.json_dict[rand_key])
+        return json.dumps(mutated_json).encode("utf-8")
+
+    def complex_mutate(self, invalid_chance = 10):
+    # We should try things in 2 stages: mutating fields, then mutating structure
+        if randint(1, 100) <= invalid_chance: # chance to invalidate. 10% by default
+            decomposed = self.single_mutate().split(b',')
+            return b','.join(self.invalidator(decomposed))
+        else:
+            return self.single_mutate()
+
+    # =================================================================
+
     # ADD INVALID JSON MUTATORS:
     # duplicate keys, single quote keys, straight up invalid stuff
     def invalidator(self, l):
@@ -84,31 +111,5 @@ class JsonMutator(mutator.Mutator):
 
     # LIST MUTATORS
 
-    # PLACEHOLDER -> SINGLE FIELD MUTATION
-    def single_mutate(self):
-        # all_fields = list(self.json_dict.keys())+list(self.json_dict.values())
-        # This doesn't test for invalid json
-        #========
-        rand_key = choice(list(self.json_dict.keys()))
-        mutated_json = self.json_dict.copy()
-        mutators = [self.field_null, self.field_large_int_random, self.field_rand_str]
-        # Replace with grammar implementation later. THis is for midpoint.
-        # Try mutate based on type
-        if type(self.json_dict[rand_key]) == int:
-            mutators += [self.field_local_int_random, self.field_replace_int_with_str]
-        elif type(self.json_dict[rand_key]) == str:
-            mutators += [self.field_replace_str_with_int]
-
-        mutated_json[rand_key] = choice(mutators)(self.json_dict[rand_key])
-
-        return json.dumps(mutated_json).encode("utf-8")
-
-    def complex_mutate(self, invalid_chance = 10):
-    # We should try things in 2 stages: mutating fields, then mutating structure
-        if randint(1, 100) <= invalid_chance: # chance to invalidate. 10% by default
-            decomposed = self.single_mutate().split(b',')
-            return b','.join(self.invalidator(decomposed))
-        else:
-            return self.single_mutate()
         
 

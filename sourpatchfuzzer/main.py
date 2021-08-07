@@ -30,7 +30,7 @@ So this is what I think our code flow should look like:
     1 is probably good enough for midpoint check-in
     2 might be necessary for more complicated fuzzing techniques
 """
-def fuzz(binary, sample):
+def fuzz(binary, sample, verbose):
 
     # PLACEHOLDER
     # Check magic bytes / struct of sample input -> make best guess for input format
@@ -54,17 +54,15 @@ def fuzz(binary, sample):
         # need a default: ascii
     except Exception as e:
         print("mutator fucked up: {}".format(e))
+    
+    print('Running fuzzer with a {} second limit...'.format(TIME_LIMIT))
 
-
-    # can pass this as data:
-    # mutations.generate_mutation
-    # or run generate_mutation for several iterations, and pass in mutations.population, a list of mutated inputs
- 
     # Some inkling of a strategy handler
     if hasattr(mutations, 'complex_mutate'):
         strategy = mutations.complex_mutate
     else:
         strategy = mutations.single_mutate
+    
     # Loop for whole timelimit 
     # In future - try multiple strategies in time limit
     while(1):
@@ -73,7 +71,9 @@ def fuzz(binary, sample):
         
         current_input = strategy()
 
-        print(current_input)
+        if verbose:
+            print(current_input)
+
         prog = harness.Harness(binary)
         # The spawned process should be stopped.  
         pid, status = prog.spawn_process(stdout=True)
@@ -115,6 +115,7 @@ if __name__ == '__main__':
     parser = ArgumentParser(description='a warm and fuzzy feeling')
     parser.add_argument('binary', help='binary to fuzz through')
     parser.add_argument('sample', help='sample valid input for binary')
+    parser.add_argument('-v','--verbose', help='show all generated output', action="store_true")
     args = parser.parse_args()
     if os.path.exists("bad.txt"):
         os.remove("bad.txt")
@@ -134,4 +135,4 @@ if __name__ == '__main__':
     #signal.signal(signal.SIGALRM, timeout)
     signal.alarm(TIME_LIMIT)
 
-    fuzz(args.binary, args.sample)
+    fuzz(args.binary, args.sample, args.verbose)
