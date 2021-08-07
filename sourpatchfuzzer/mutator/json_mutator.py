@@ -48,7 +48,7 @@ class JsonMutator:
         self.add_pop(candidate)
         return candidate 
     #
-
+    
     # ===================================================================
     # list of mutations:
     # All of these mutations are from the fuzzing book
@@ -80,6 +80,12 @@ class JsonMutator:
 
     # TEMPORARY
     
+    # ADD INVALID JSON MUTATORS:
+    # duplicate keys, single quote keys, straight up invalid stuff
+    def invalidator(self):
+        print(self)
+
+
     # GENERIC MUTATORS
     def field_null(self, s):
         return None
@@ -106,13 +112,14 @@ class JsonMutator:
         except:
             return 0 
 
-    
     # LIST MUTATORS
 
     # PLACEHOLDER -> SINGLE FIELD MUTATION
     def single_mutate(self):
+        # all_fields = list(self.json_dict.keys())+list(self.json_dict.values())
+        # This doesn't test for invalid json
+        #========
         rand_key = choice(list(self.json_dict.keys()))
-
         mutated_json = self.json_dict.copy()
         mutators = [self.field_null, self.field_large_int_random, self.field_rand_str]
         # Replace with grammar implementation later. THis is for midpoint.
@@ -125,3 +132,7 @@ class JsonMutator:
         mutated_json[rand_key] = choice(mutators)(self.json_dict[rand_key])
 
         return json.dumps(mutated_json).encode("utf-8")
+
+    def complex_mutate(self):
+    # We should try things in 2 stages: mutating fields, then mutating structure
+        print(self.single_mutate)

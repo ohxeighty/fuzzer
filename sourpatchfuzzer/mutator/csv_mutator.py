@@ -21,9 +21,9 @@ class CsvMutator:
             reader = csv.DictReader(f)
             return [rows for rows in reader]
 
-    def __init__(self, sample, min=2, max=10): 
+    def __init__(self, sample_processed, min=2, max=10): 
         # By convention, header is the first row 
-        self.csv_list = self.process_csv(sample) 
+        self.csv_list = sample_processed 
         self.csv_headers = list(self.csv_list[0].keys())
         self.min = min
         self.max = max

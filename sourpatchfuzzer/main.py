@@ -11,6 +11,8 @@ import time
 import ptrace 
 import signal
 
+TIME_LIMIT = 5 #60*3
+
 """
 So this is what I think our code flow should look like:
     main gets the binary and sample file
@@ -33,15 +35,25 @@ def fuzz(binary, sample):
     # PLACEHOLDER
     # Check magic bytes / struct of sample input -> make best guess for input format
     # This should be moved into mutation logic -> this is a shortcut for midpoint
-    try:
-        # move to mutator later
-        sample_processed = SampleParser(sample)
-        mutations = JsonMutator(sample_processed.data, min=2, max=10)
-    except:
-        # midpoint, csv
-        mutations = CsvMutator(sample, min=2, max=10)
-
+    sample_processed = SampleParser(sample)
     
+    try:
+    # data: that one plaintext file
+    # ASCII text: plaintext
+    # JSON data: json
+    # CSV text: csv
+    # HTML document, ASCII text: xml2
+
+        mutations = {
+            'JSON data' : lambda sample_processed:JsonMutator(sample_processed.data, min=2, max=10),
+            'CSV text': lambda sample_processed:CsvMutator(sample_processed.csv(), min=2, max=10)
+            }[sample_processed.guess](sample_processed)
+    except KeyError as e:
+        print('Unmatched data type: {}, defaulting to generic mutator'.format(e))
+        mutations = Mutator(sample_processed)
+        # need a default: ascii
+    except Exception as e:
+        print("mutator fucked up: {}".format(e))
 
 
     # can pass this as data:
@@ -67,7 +79,6 @@ def fuzz(binary, sample):
         prog.close_input() 
         # why in the everloving fuck does RESIZING A TERMINAL alter the behaviour of waitpid ????????
         # sigwinch. thats why. 
-
         while(1):
             # sigsegv doesn't count as a termination signal.
             # since it gets caught by ptrace (only sigkill goes through ptrace) 
@@ -86,7 +97,12 @@ def fuzz(binary, sample):
                 break
             prog.cont()
 
-
+def timeout(num, stack):
+    print("=========================================")
+    print("Time limit reached: {}".format(TIME_LIMIT))
+    print("You look nice today!")
+    # We could put a neat summary here
+    exit(0)
 
 
 if __name__ == '__main__':
@@ -94,6 +110,8 @@ if __name__ == '__main__':
     parser.add_argument('binary', help='binary to fuzz through')
     parser.add_argument('sample', help='sample valid input for binary')
     args = parser.parse_args()
+    if os.path.exists("bad.txt"):
+        os.remove("bad.txt")
     
     if not isfile(args.binary):
         print('"{}" not found!'.format(args.binary))
@@ -105,5 +123,9 @@ if __name__ == '__main__':
     # enforce absolute
     args.binary = os.path.abspath(args.binary)
     args.sample = os.path.abspath(args.sample)
+    
+    # set a timer for 3 minutes
+    #signal.signal(signal.SIGALRM, timeout)
+    signal.alarm(TIME_LIMIT)
 
     fuzz(args.binary, args.sample)
