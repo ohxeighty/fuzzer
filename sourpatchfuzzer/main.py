@@ -31,7 +31,6 @@ So this is what I think our code flow should look like:
     2 might be necessary for more complicated fuzzing techniques
 """
 def fuzz(binary, sample, verbose):
-
     """
     block based code coverage? edge coverage is hard and requires actual... algorithms (and source)
     and if we got X amount of time without new coverage, we start from scratch? (bandaid 
@@ -75,20 +74,16 @@ def fuzz(binary, sample, verbose):
     
     while(1):
 
-        # in future, call parent method -> give me a mutation.. 
-        
+        # in future, call parent method -> give me a mutation..     
         current_input = strategy()
-
         if verbose:
             print(strategy)
             print(current_input)
+            print("pid {}".format(pid))
 
-        prog = harness.Harness(binary)
         # Spawn process - should be stopped after exec. 
-        pid, status = prog.spawn_process(stdout=True)
+        pid, status = prog.spawn_process(stdout=False)
         prog.getregs()
-        print(prog.registers.eip)
-        print("pid {}".format(pid))
         # Now that the process has been spawned, we can populate the breakpoints
         prog.populate_breakpoints()
         prog.breakpoint_status()
@@ -124,7 +119,6 @@ def fuzz(binary, sample, verbose):
             elif(os.WIFSTOPPED(status) and (os.WSTOPSIG(status) == signal.SIGTRAP)):
                 # we need to decrement eip, replace the breakpoint with its saved value
                 prog.restore_current_bp() 
-                input()
 
             elif(os.WIFEXITED(status)):
                 break
@@ -145,7 +139,7 @@ if __name__ == '__main__':
     parser = ArgumentParser(description='a warm and fuzzy feeling')
     parser.add_argument('binary', help='binary to fuzz through')
     parser.add_argument('sample', help='sample valid input for binary')
-    parser.add_argument('-v','--verbose', help='show all generated output', action="store_true")
+    parser.add_argument('-v','--verbose', help='show all generated output', action="store_true", default=False)
     args = parser.parse_args()
     if os.path.exists("bad.txt"):
         os.remove("bad.txt")
@@ -161,8 +155,8 @@ if __name__ == '__main__':
     args.binary = os.path.abspath(args.binary)
     args.sample = os.path.abspath(args.sample)
     
-    # set a timer for 3 minutes
-    signal.signal(signal.SIGALRM, timeout)
-    signal.alarm(TIME_LIMIT)
+    ## set a timer for 3 minutes
+    #signal.signal(signal.SIGALRM, timeout)
+    #signal.alarm(TIME_LIMIT)
 
     fuzz(args.binary, args.sample, args.verbose)

@@ -10,7 +10,8 @@ class SampleParser:
         with open(sample, "rb") as f:
             self.sample = sample
             self.data = f.read()
-            mage = magic.Magic(magic_file="parser/magic.mgc")
+            #mage = magic.Magic(magic_file="parser/magic.mgc")
+            mage = magic.Magic()
             self.guess = mage.from_buffer(self.data)
             if "JFIF" in self.guess:
                 self.guess = "JFIF"
