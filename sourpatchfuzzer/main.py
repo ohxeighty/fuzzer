@@ -72,12 +72,14 @@ def fuzz(binary, sample, verbose):
     # Loop for whole timelimit 
     # In future - try multiple strategies in time limit
     prog = harness.Harness(binary)
+    
     while(1):
 
         # in future, call parent method -> give me a mutation.. 
         
         current_input = strategy()
 
+<<<<<<< HEAD
         if verbose:
             print(strategy)
             print(current_input)
@@ -86,18 +88,35 @@ def fuzz(binary, sample, verbose):
         # The spawned process should be stopped.  
         pid, status = prog.spawn_process(stdout=False)
         prog.cont()
+=======
+        # Spawn process - should be stopped after exec. 
+        pid, status = prog.spawn_process(stdout=True)
+        prog.getregs()
+        print(prog.registers.eip)
+        print("pid {}".format(pid))
+        # Now that the process has been spawned, we can populate the breakpoints
+        prog.populate_breakpoints()
+        prog.breakpoint_status()
+>>>>>>> 69e7b27 (Holy fucking shit progress.)
 
+        # Start the process proper 
+        prog.cont()
         prog.send(current_input) 
 
         # simulate EOF 
         prog.close_input() 
         # why in the everloving fuck does RESIZING A TERMINAL alter the behaviour of waitpid ????????
         # sigwinch. thats why. 
+
+        # Wait for something to happen. 
         while(1):
             # sigsegv doesn't count as a termination signal.
             # since it gets caught by ptrace (only sigkill goes through ptrace) 
             # WSTOPSIG == 11 == SIGSEGV -> segfault
+
             pid, status = prog.wait()
+            if(os.WIFSTOPPED(status)):
+                print(os.WSTOPSIG(status))
             if(os.WIFSTOPPED(status) and (os.WSTOPSIG(status) == signal.SIGSEGV)):
                 # Placeholder -> Need to create file with crash input and integrate 
                 # fuzzing engine. 
@@ -107,8 +126,16 @@ def fuzz(binary, sample, verbose):
                     # since most formats have newlines in them
                     f.write(str(current_input).encode("unicode-escape") + b"\n")
                 break
+            # we have hit one of our basic block breakpoints
+            elif(os.WIFSTOPPED(status) and (os.WSTOPSIG(status) == signal.SIGTRAP)):
+                # we need to decrement eip, replace the breakpoint with its saved value
+                prog.restore_current_bp() 
+                input()
+
             elif(os.WIFEXITED(status)):
                 break
+
+            #prog.step()
             prog.cont()
 
 def timeout(num, stack):
@@ -141,7 +168,12 @@ if __name__ == '__main__':
     args.sample = os.path.abspath(args.sample)
     
     # set a timer for 3 minutes
+<<<<<<< HEAD
     signal.signal(signal.SIGALRM, timeout)
     signal.alarm(TIME_LIMIT)
+=======
+    #signal.signal(signal.SIGALRM, timeout)
+    #signal.alarm(TIME_LIMIT)
+>>>>>>> 69e7b27 (Holy fucking shit progress.)
 
     fuzz(args.binary, args.sample, args.verbose)
