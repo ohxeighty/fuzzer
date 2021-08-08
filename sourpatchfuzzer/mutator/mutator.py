@@ -1,6 +1,6 @@
 from random import randint, randrange, choice
 import parser
-
+import copy 
 class Mutator:
     """
     Mutator(min, max, sample input)
@@ -25,7 +25,7 @@ class Mutator:
         if len(self.population) >= 1:
             output = choice(self.population)
         else:
-            output = self.data
+            output = copy.deepcopy(self.data)
         tries = randint(self.min, self.max)
         for i in range(0, tries):
             output = self.mutate(output)
