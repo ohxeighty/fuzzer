@@ -84,6 +84,8 @@ class Mutator:
     # list of mutations:
     # All of these mutations are modified from the fuzzing book
     # see: https://www.fuzzingbook.org/html/MutationFuzzer.html
+    def insert_large(self, s):
+        return "A"*5000
     def insert_random(self, s):
         pos = 0
         if len(s) >= 2 :
@@ -129,6 +131,6 @@ class Mutator:
         return s[:pos]+new+s[pos+1:]
 
     def mutate(self, s): # Expects a bytestring or string
-        mutators = [self.insert_random, self.delete_random, self.flip_random_bit, self.replace_random]
+        mutators = [self.insert_random, self.delete_random, self.flip_random_bit, self.replace_random, self.insert_large]
         pick = choice(mutators)
         return pick(s)

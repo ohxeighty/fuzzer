@@ -68,7 +68,7 @@ class CsvMutator(mutator.Mutator):
         n = randrange(1,100)
         mutated_list = self.csv_list.copy()
         for i in range(n):
-            mutated_list.append(dict(zip(self.csv_headers, [self.rand_str(10) for i in range(len(self.csv_headers))])))
+            mutated_list.append(dict(zip(self.csv_headers, [self.rand_str(100) for i in range(len(self.csv_headers))])))
         return mutated_list
 
     # Write CSV
