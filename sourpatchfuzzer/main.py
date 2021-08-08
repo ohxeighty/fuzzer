@@ -88,9 +88,6 @@ def fuzz(binary, sample, verbose, prog):
             print(strategy)
             print(current_input)
             print("pid {}".format(pid))
-        prog.getregs()
-        # Now that the process has been spawned, we can populate the breakpoints
-        prog.populate_breakpoints()
         #prog.breakpoint_status()
 
         # Start the process proper 
@@ -105,7 +102,6 @@ def fuzz(binary, sample, verbose, prog):
         print("coverage: {}, this run: {}".format(prog.coverage(), cov))
         if prog.coverage() > cov:
             cov = prog.coverage()
-            print(cov)
             mutations.add_pop(current_input)
         # Wait for something to happen. 
         while(1):
