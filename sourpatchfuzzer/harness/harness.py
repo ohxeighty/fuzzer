@@ -133,6 +133,9 @@ class Harness:
         self.cfg.normalize()
         
         self.bbv = []
+        self.reinit_breakpoints() 
+
+    def reinit_breakpoints(self):
         for node in self.cfg.functions.values():
             #print(self.cfg.functions[0x8049289])
             # ignore some functions
