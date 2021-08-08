@@ -19,16 +19,21 @@ class JsonMutator(mutator.Mutator):
 
     def __init__(self, sample, min=2, max=10): 
         self.json_dict = json.loads(sample) 
-        mutator.Mutator.__init__(self, None, min, max)
+        mutator.Mutator.__init__(self, self.json_dict, min, max)
         return
        # TEMPORARY
-    
+   
+    def add_pop(self, pop):
+        try:
+            self.population.append(json.loads(pop))
+        except:
+            pass
     # ================================================================
     # Filetype: JSON
     # Main strategies: single field mutation, corrupting structure of input
 
     def single_mutate(self):
-        rand_key = choice(list(self.json_dict.keys()))
+        rand_key = choice(list(choice(self.population).keys()))
         mutated_json = self.json_dict.copy()
         mutators = [self.field_null, self.field_large_int_random, self.field_rand_str]
         # Try mutate based on type

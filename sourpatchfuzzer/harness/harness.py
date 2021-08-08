@@ -162,6 +162,9 @@ class Harness:
     def breakpoint_status(self):
         print("Current Coverage: {}/{}".format(len(self.bbv)-len(self.breakpoints),len(self.bbv)))
 
+    def coverage(self):
+        return float((len(self.bbv)-len(self.breakpoints))/len(self.bbv))
+
     def monitor(self):
         #child_data = os.read(self.er_pipe, 5096)
         

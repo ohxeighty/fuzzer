@@ -9,10 +9,10 @@ class Mutator:
     Do we pass in input here, or provide the input to the harness? Ideally we want to be able to tell this class coverage information for better pop development
     """
 
-    def __init__(self, sample=None, min=2, max=10):
+    def __init__(self, sample=None, min=1, max=5):
         if sample is not None:
             self.data = sample
-        self.population = []
+        self.population = [sample]
         self.min = min
         self.max = max
         return
@@ -22,14 +22,17 @@ class Mutator:
     # Main strategies: kitchen sink
 
     def single_mutate(self):
-        output = self.data
-        #print(output)
+        if len(self.population) >= 1:
+            output = choice(self.population)
+        else:
+            output = self.data
         tries = randint(self.min, self.max)
         for i in range(0, tries):
             output = self.mutate(output)
         return output
 
     def complex_mutate(self, invalid_chance = 10):
+        print(self.population)
         output = self.single_mutate()
         if randint(1,100) <= invalid_chance:
             complex = choice([self.duplicate, self.insert_special])
@@ -48,8 +51,8 @@ class Mutator:
         return s[:pos] + randchar + s[pos:]       
 
     def duplicate(self, s):
-        return s*100
-    
+        return s*2
+
     # Population controls:
 
     def add_pop(self, pop):
@@ -89,12 +92,24 @@ class Mutator:
         if isinstance(s, str):
             randchar = chr(randrange(32,127))
         else:
-            randchar = bytes(randrange(32,127))
+            randchar = bytes((chr(randrange(32,127))), encoding='utf8')
+        #print("at {}, string is {}, adding {}".format(pos, s, randchar))
         return s[:pos] + randchar + s[pos:]
+    
+    def replace_random(self,s):
+        if len(s) >= 2 :
+            pos = randint(0, len(s)-1)
+
+            if isinstance(s, str):
+                randchar = chr(randrange(32,127))
+            else:
+                randchar = bytes((chr(randrange(32, 127))), encoding='utf8')
+            return s[:pos]+randchar+s[pos:]
 
     def delete_random(self, s):
         if len(s) >= 2 :
             pos = randint(0, len(s)-1)
+            #print("deleting pos {} of {}".format(pos, s))
             return s[:pos]+s[pos+1:]
         return s
 
@@ -109,10 +124,11 @@ class Mutator:
         if isinstance(s, str):
             new = chr(ord(c)^bit)
         else:
-            new = bytes(c^bit)
+            new = bytes((chr(c^bit)),encoding='utf8')
+        #print("flipping {} of {} to {}".format(pos, s, new))
         return s[:pos]+new+s[pos+1:]
 
     def mutate(self, s): # Expects a bytestring or string
-        mutators = [self.insert_random, self.delete_random, self.flip_random_bit]
+        mutators = [self.insert_random, self.delete_random, self.flip_random_bit, self.replace_random]
         pick = choice(mutators)
         return pick(s)

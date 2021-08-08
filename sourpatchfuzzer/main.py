@@ -12,7 +12,7 @@ import ptrace
 import signal
 from functools import partial
 
-TIME_LIMIT = 5 #60*3
+TIME_LIMIT = 60*3
 
 """
 So this is what I think our code flow should look like:
@@ -71,7 +71,7 @@ def fuzz(binary, sample, verbose, prog):
     
     # Loop for whole timelimit 
     # In future - try multiple strategies in time limit
-    
+    cov = float(0)
     while(1):
         prog.iterations += 1 
 
@@ -81,6 +81,9 @@ def fuzz(binary, sample, verbose, prog):
 
         # Spawn process - should be stopped after exec. 
         pid, status = prog.spawn_process(stdout=False)
+        prog.getregs()
+        # Now that the process has been spawned, we can populate the breakpoints
+        prog.populate_breakpoints()
         if verbose:
             print(strategy)
             print(current_input)
@@ -98,12 +101,19 @@ def fuzz(binary, sample, verbose, prog):
         prog.close_input() 
         # why in the everloving fuck does RESIZING A TERMINAL alter the behaviour of waitpid ????????
         # sigwinch. thats why. 
-
+        
+        print("coverage: {}, this run: {}".format(prog.coverage(), cov))
+        if prog.coverage() > cov:
+            cov = prog.coverage()
+            print(cov)
+            mutations.add_pop(current_input)
         # Wait for something to happen. 
         while(1):
             # sigsegv doesn't count as a termination signal.
             # since it gets caught by ptrace (only sigkill goes through ptrace) 
             # WSTOPSIG == 11 == SIGSEGV -> segfault
+
+                
 
             pid, status = prog.wait()
             if(os.WIFSTOPPED(status) and (os.WSTOPSIG(status) == signal.SIGSEGV)):
@@ -113,8 +123,9 @@ def fuzz(binary, sample, verbose, prog):
                 # Update stats
                 prog.getregs()
                 prog.crash_eips.append(prog.registers.eip) 
+                #if verbose:
+                #    print("Input crashed program with signal: {}".format(os.WSTOPSIG(status)))
 
-                #print("Input crashed program with signal: {}".format(os.WSTOPSIG(status)))
                 with open("bad.txt", "ab+") as f:
                     # write the byte string
                     # since most formats have newlines in them
