@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import harness
-from mutator import Mutator, JsonMutator, CsvMutator, JpgMutator
+from mutator import Mutator, JsonMutator, CsvMutator, JpgMutator, XmlMutator
 from parser import SampleParser
 from argparse import ArgumentParser
 from os.path import isfile
@@ -50,12 +50,12 @@ def fuzz(binary, sample, verbose, prog):
     # JSON data: json
     # CSV text: csv
     # HTML document, ASCII text: xml2
-
         mutations = { # walmart switch statement
             'JSON' : lambda sample_processed:JsonMutator(sample_processed.data, min=2, max=10),
             'CSV': lambda sample_processed:CsvMutator(sample_processed.csv(), min=2, max=10),
             'JFIF': lambda sample_processed:JpgMutator(sample_processed.jpg(), min=2, max=10),
-            'XML': lambda sample_processed:XmlMutator(sample_processed.xml(), min=2, max=10)
+            'XML': lambda sample_processed:XmlMutator(sample_processed.xml(), min=2, max=10),
+            'HTML document, ASCII text': lambda sample_processed:XmlMutator(sample_processed.xml(), min=2, max=10)
             }[sample_processed.guess](sample_processed)
     except KeyError as e:
         print('Unmatched data type: {}, defaulting to generic mutator'.format(e))
