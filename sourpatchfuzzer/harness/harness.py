@@ -141,6 +141,9 @@ class Harness:
                 symbol = self.angr_project.loader.find_symbol(node.addr)
                 # drop some setup funcs
                 if symbol:
+                    # cle identified as extern
+                    if symbol.owner.is_main_bin:
+                        continue 
                     if symbol.is_import:
                         continue
                     if symbol.name in skip_setup_funcs:
