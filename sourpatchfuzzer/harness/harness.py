@@ -133,9 +133,6 @@ class Harness:
         self.cfg.normalize()
         
         self.bbv = []
-        self.reinit_breakpoints() 
-
-    def reinit_breakpoints(self):
         for node in self.cfg.functions.values():
             #print(self.cfg.functions[0x8049289])
             # ignore some functions
@@ -153,8 +150,13 @@ class Harness:
                         continue
                     for block in node.blocks:
                         self.bbv.append(block.addr)
-                        # initialise breakpoints 
+                        # initialize bp
                         self.breakpoints[block.addr] = 0 
+
+    def reinit_breakpoints(self):
+        self.breakpoints = dict()
+        for block in self.bbv:
+            self.breakpoints[block.addr] = 0 
 
     def populate_breakpoints(self):
         # pretty sure the process has to be stopped 
