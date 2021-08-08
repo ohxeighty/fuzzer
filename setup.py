@@ -5,4 +5,4 @@ setup(name="Sour Patch Fuzzer",
         description="A sour fuzzer",
         author="The Sour Patch Kids",
         packages=["sourpatchfuzzer"],
-        install_requires=["cle"],)
+        install_requires=["angr", "python-magic"],)
