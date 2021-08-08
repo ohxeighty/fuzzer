@@ -88,7 +88,7 @@ def fuzz(binary, sample, verbose, prog):
         prog.getregs()
         # Now that the process has been spawned, we can populate the breakpoints
         prog.populate_breakpoints()
-        prog.breakpoint_status()
+        #prog.breakpoint_status()
 
         # Start the process proper 
         prog.cont()

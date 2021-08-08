@@ -4,8 +4,23 @@ actual docs :)
 Our fuzzer is comprised of several main components: 
 ## Main Interface
 The parent script is responsible for parsing user input, attaching the harness and driving the mutator 
+
 ## Mutator module
 The mutator module provides the mutators for supported structured file formats along with a generic mutator. The mutator takes in code coverage (supplied by the harness) as feedback to tune its corpus of inputs. 
+
 ## Harness
-The harness implements the low level instrumentation of the binary along with any necessary IO. Instrumentation of the binary is 
+The harness implements the low level instrumentation of the binary along with any necessary IO. 
+
+### Technical Overview
+**something awesome? :) ** - low level instrumentation and harness is all custom work; ptrace is ~~torture~~ fun!*
+
+Instrumentation of the binary is accomplished primarily through invocations of ptrace (pulled from libc with ctypes). 
+
+To spawn the victim, the harness forks: the child indicates it should be traced with `PTRACE_TRACEME` and disables ASLR (by calling `personality(ADDR_NO_RANDOMIZE)`) before execv'ing the target binary while the parent waits until `SIGTRAP` is received - indicating that the child is now waiting to continue from its entrypoint. From here, the harness can pass control back up to the main fuzzing loop. 
+
+**In future, we should allow the harness to restart the binary in memory by restoring userland registers and jumping back to `_start` - (i.e. akin to GDB's checkpoint functionality). the major obstacle in implementing this was time (if its not the due date its not the do date...) & programmatically identifying offsets to user controlled data to save (e.g. by pulling from /proc/{pid}/mem).**
+
+This tracing layer allows the parent (i.e. the fuzzer) to inject and intercept signals (importantly, `SIGTRAP` for breakpoints & `SIGSEGV` for segmentation faults) and perform all other instrumentation primitives as detailed in the `ptrace(2)` man page. 
+
+Specifically, we use make use of angr's control flow graph (represented as a NetworkX object) to create a **basic block vector** (where a basic block is a continuous block of assembly code without any control structures like `jmp` or `call`). After filtering these blocks (for example, we don't care about symbols that resolve externally to say, libc, or generic constructor / destructor functions such as `register_tm_clones`) we can then add breakpoints (implemented with `int 3` software breakpoints - the LSB of instruction @ the block is swapped with `\xcc` ) to the start of each basic block (that persist through multiple runs) that are removed when hit; thereby serving as an indicator of code coverage (which is fed back up to the mutator). 
 

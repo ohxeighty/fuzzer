@@ -156,7 +156,7 @@ class Harness:
     def populate_breakpoints(self):
         # pretty sure the process has to be stopped 
         for addr in self.breakpoints.keys(): 
-            print("Adding breakpoint at {}".format(hex(addr)))
+            #print("Adding breakpoint at {}".format(hex(addr)))
             self.breakp(addr)
     
     def breakpoint_status(self):
