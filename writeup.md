@@ -46,3 +46,9 @@ The possible mutations are:
 	- Mutate a random field generally
 	- Append new rows of random strings
 	- Replace existing rows with random strings
+
+- The JPG mutator disassembles the sample input using the standard JPG file format into fields
+- Each field may be randomly mutated before being repacked
+	- Mutate a random field generally
+	- Append new rows of random strings
+	- Replace existing rows with random strings

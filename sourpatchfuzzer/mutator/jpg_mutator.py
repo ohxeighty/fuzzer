@@ -7,7 +7,6 @@ import string
 class JpgMutator(mutator.Mutator):
     """
     why doesn't this work
-    because you are small dummmy
     """
     def __init__(self, sample, min=2, max=10):
         self.jpg = sample
@@ -31,7 +30,7 @@ class JpgMutator(mutator.Mutator):
 
     def complex_mutate(self):
         output = self.jpg
-        mutations = ['data','length','header']
+        mutations = ['data','length','header','swap']
         tries = randint(self.min, self.max)
         for i in range(0, tries):
             pick = choice(mutations)
@@ -41,6 +40,8 @@ class JpgMutator(mutator.Mutator):
                     output.datas[randfield] = self.mangle_data(output.datas[randfield])
             elif pick == 'length':
                 output.lengths = self.mangle_length(output.lengths)
+            elif pick == 'swap':
+                self.mangle_swap()
             else:
                 output.headers = self.mangle_header(output.headers)
         return output.pack()
@@ -67,3 +68,20 @@ class JpgMutator(mutator.Mutator):
             headers.append(headers[randfield])
         return headers
 
+    def mangle.swap(self):
+        nums = list(range(self.size))
+        c1 = choice(nums)
+        nums = nums[0:c1] + nums[c1+1:]
+        c2 = choice(nums)
+        temp = self.datas[c1]
+        self.datas[c1] = self.datas[c2]
+        self.datas[c2] = temp
+        temp = self.lengths[c1]
+        self.lengths[c1] = self.lengths[c2]
+        self.lengths[c2] = temp
+        temp = self.positions[c1]
+        self.positions[c1] = self.positions[c2]
+        self.positions[c2] = temp
+        temp = self.headers[c1]
+        self.headers[c1] = self.headers[c2]
+        self.headers[c2] = temp
