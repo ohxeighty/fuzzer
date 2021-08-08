@@ -142,7 +142,7 @@ class Harness:
                 # drop some setup funcs
                 if symbol:
                     # cle identified as extern
-                    if symbol.owner.is_main_bin:
+                    if not symbol.owner.is_main_bin:
                         continue 
                     if symbol.is_import:
                         continue
@@ -156,7 +156,7 @@ class Harness:
     def populate_breakpoints(self):
         # pretty sure the process has to be stopped 
         for addr in self.breakpoints.keys(): 
-            #print("Adding breakpoint at {}".format(hex(addr)))
+            print("Adding breakpoint at {}".format(hex(addr)))
             self.breakp(addr)
     
     def breakpoint_status(self):
