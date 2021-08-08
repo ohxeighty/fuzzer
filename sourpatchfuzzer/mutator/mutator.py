@@ -1,6 +1,6 @@
 from random import randint, randrange, choice
 import parser
-
+import copy 
 class Mutator:
     """
     Mutator(min, max, sample input)
@@ -25,7 +25,7 @@ class Mutator:
         if len(self.population) >= 1:
             output = choice(self.population)
         else:
-            output = self.data
+            output = copy.deepcopy(self.data)
         tries = randint(self.min, self.max)
         for i in range(0, tries):
             output = self.mutate(output)
@@ -85,6 +85,8 @@ class Mutator:
     # list of mutations:
     # All of these mutations are modified from the fuzzing book
     # see: https://www.fuzzingbook.org/html/MutationFuzzer.html
+    def insert_large(self, s):
+        return "A"*5000
     def insert_random(self, s):
         pos = 0
         if len(s) >= 2 :
@@ -130,6 +132,6 @@ class Mutator:
         return s[:pos]+new+s[pos+1:]
 
     def mutate(self, s): # Expects a bytestring or string
-        mutators = [self.insert_random, self.delete_random, self.flip_random_bit, self.replace_random]
+        mutators = [self.insert_random, self.delete_random, self.flip_random_bit, self.replace_random, self.insert_large]
         pick = choice(mutators)
         return pick(s)
