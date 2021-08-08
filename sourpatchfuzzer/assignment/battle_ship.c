@@ -8,27 +8,34 @@ int main(int argc, char* argv[]) {
         p1_ships[i] = malloc(sizeof(64));
         p2_ships[i] = malloc(sizeof(64));
     }
-    printf("Hello and welcome to the Battle Ship game analysis program, by the sour patch kids (combined age 4)\n");
-    if(argc != 2) {
-        printf("Usage: ./battleship <log>\n");
-        return 0;
-    }
-    printf("Now analysing game of battle ship...");
-    FILE* log = fopen(argv[1], "r");
-    if(log == NULL) {
-        printf("Couldn't open game log!\n");
-        return 0;
-    }
-    fgets(p1_ships[0], 64, log);
-    fgets(p1_ships[1], 64, log);
-    fgets(p1_ships[2], 64, log);
-    fgets(p1_ships[3], 64, log);
-    fgets(p1_ships[4], 64, log);
-    fgets(p2_ships[0], 64, log);
-    fgets(p2_ships[1], 64, log);
-    fgets(p2_ships[2], 64, log);
-    fgets(p2_ships[3], 64, log);
-    fgets(p2_ships[4], 64, log);
+    printf("Hello and welcome to the Battle Ship game, by the sour patch kids (combined age 4)\n");
+
+    printf("Player one please enter your aircraft carrier's location: ");
+    gets(p1_ships[0]);
+    printf("\nPlayer one please enter your battle ship's location: ");
+    gets(p1_ships[1]);
+    printf("\nPlayer one please enter your submarine's location: ");
+    gets(p1_ships[2]);
+    printf("\nPlayer one please enter your destroyer's location: ");
+    gets(p1_ships[3]);
+    printf("\nPlayer one please enter your frigate's location: ");
+    gets(p1_ships[4]);
+    
+    printf("\n\n\nPlease turn the keyboard and screen to player two now\n\n\n");
+    
+    printf("\nPlayer two please enter your aircraft carrier's location: ");
+    gets(p2_ships[0]);
+    printf("\nPlayer two please enter your battle ship's location: ");
+    gets(p2_ships[1]);
+    printf("\nPlayer two please enter your submarine's location: ");
+    gets(p2_ships[2]);
+    printf("\nPlayer two please enter your destroyer's location: ");
+    gets(p2_ships[3]);
+    printf("\nPlayer two please enter your frigate's location: ");
+    gets(p2_ships[4]);
+    
+    printf("\n\n\nPlease turn the keyboard and screen to player one now\n\n\n");
+
     printf("\nPlayer one's aircraft carrier: ");
     printf(p1_ships[0]);
     printf("Player one's battle ship: ");
@@ -39,6 +46,8 @@ int main(int argc, char* argv[]) {
     printf(p1_ships[3]);
     printf("Player one's frigate: ");
     printf(p1_ships[4]);
+
+    printf("\n\n\nPlease turn the keyboard and screen to player two now\n\n\n");
 
     printf("\nPlayer two's aircraft carrier: ");
     printf(p2_ships[0]);

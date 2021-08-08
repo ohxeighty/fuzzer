@@ -32,7 +32,7 @@ class Jpg:
             if(self.lengths[i]):
                 packed[self.positions[i]+2:self.positions[i]+4] = self.lengths[i]
                 sec_len = int(self.lengths[i].hex(), 16)
-                print(sec_len)
-                packed[self.positions[i]+4:self.positions[i]+sec_len+4] = self.datas[i]
+                if(positions[i]):
+                    packed[self.positions[i]+4:self.positions[i]+sec_len+4] = self.datas[i]
         return bytes(packed)
 
