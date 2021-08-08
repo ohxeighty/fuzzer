@@ -23,7 +23,7 @@ class Mutator:
 
     def single_mutate(self):
         output = self.data
-        print(output)
+        #print(output)
         tries = randint(self.min, self.max)
         for i in range(0, tries):
             output = self.mutate(output)

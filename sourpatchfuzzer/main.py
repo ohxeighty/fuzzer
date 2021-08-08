@@ -88,7 +88,7 @@ def fuzz(binary, sample, verbose, prog):
         prog.getregs()
         # Now that the process has been spawned, we can populate the breakpoints
         prog.populate_breakpoints()
-        prog.breakpoint_status()
+        #prog.breakpoint_status()
 
         # Start the process proper 
         prog.cont()
@@ -106,8 +106,6 @@ def fuzz(binary, sample, verbose, prog):
             # WSTOPSIG == 11 == SIGSEGV -> segfault
 
             pid, status = prog.wait()
-            if(os.WIFSTOPPED(status)):
-                print(os.WSTOPSIG(status))
             if(os.WIFSTOPPED(status) and (os.WSTOPSIG(status) == signal.SIGSEGV)):
                 # Placeholder -> Need to create file with crash input and integrate 
                 # fuzzing engine. 
@@ -116,7 +114,7 @@ def fuzz(binary, sample, verbose, prog):
                 prog.getregs()
                 prog.crash_eips.append(prog.registers.eip) 
 
-                print("Input crashed program with signal: {}".format(os.WSTOPSIG(status)))
+                #print("Input crashed program with signal: {}".format(os.WSTOPSIG(status)))
                 with open("bad.txt", "ab+") as f:
                     # write the byte string
                     # since most formats have newlines in them
@@ -141,7 +139,9 @@ def timeout(num, stack, prog):
     # We could put a neat summary here
 
     print("Total crashes: {}".format(len(prog.crash_eips)))
-    print("Unique crashes: {}".format(len(set(prog.crash_eips))))
+    # sometimes, buffer overflow or other memory corruption means we cannot read EIP reliably
+    # :) 
+    #print("Unique crashes: {}".format(len(set(prog.crash_eips))))
     print("Total iterations: {}".format(prog.iterations))
 
     exit(0)
