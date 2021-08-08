@@ -134,13 +134,17 @@ class Harness:
         
         self.bbv = []
         for node in self.cfg.functions.values():
+            #print(self.cfg.functions[0x8049289])
             # ignore some functions
             if not node.name.startswith("__"):
                 # we dont care about externs
                 symbol = self.angr_project.loader.find_symbol(node.addr)
                 # drop some setup funcs
                 if symbol:
-                    if symbol.is_export or symbol.is_import:
+                    # cle identified as extern
+                    if not symbol.owner.is_main_bin:
+                        continue 
+                    if symbol.is_import:
                         continue
                     if symbol.name in skip_setup_funcs:
                         continue
@@ -152,7 +156,7 @@ class Harness:
     def populate_breakpoints(self):
         # pretty sure the process has to be stopped 
         for addr in self.breakpoints.keys(): 
-            #print("Adding breakpoint at {}".format(hex(addr)))
+            print("Adding breakpoint at {}".format(hex(addr)))
             self.breakp(addr)
     
     def breakpoint_status(self):
