@@ -86,7 +86,7 @@ class Mutator:
     # All of these mutations are modified from the fuzzing book
     # see: https://www.fuzzingbook.org/html/MutationFuzzer.html
     def insert_large(self, s):
-        return "A"*5000
+        return b"A"*5000
     def insert_random(self, s):
         pos = 0
         if len(s) >= 2 :
