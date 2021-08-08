@@ -53,19 +53,22 @@ Our JSON mutator disassembles the sample input using a json library into fields.
 - Set a random field's contents to a random string
 - If the field selected is an integer, change the integer to a random value
 - Replace a field's contents with data of a different type
+- Perform any generic mutations on the field's contents
 
 The JSON mutator also supports structural mutations to the JSON file. Currently, the following mutations to the JSON structure are supported:
 - Duplicate a random line in the input file
 - Swap single quotes in a random line with double quotes and vice versa
 - Perform any generic mutations on random lines
 
-Our CSV mutator disassembles the sample input using a csv library into fields. Fields are then mutated at random individually. Our main strategy for mutating CSV input files is to mutate individual fields at random. mutator disassembles the sample input using a csv library into fields
-- Each field may be randomly mutated before being repacked
-- The possible mutations are:
-	- Mutate a random field generally
-	- Append new rows of random strings
-	- Replace existing rows with random strings
+Our CSV mutator disassembles the sample input using a csv library into fields. Fields are then mutated at random individually. Our main strategy for mutating CSV input files is to mutate individual fields at random. We currently support the following mutations:
+- Perform any generic mutations on the field's contents
+- Completely randomise the contents of every field in a row
+- Append rows consisting of random data into the CSV
+- Replace an entire row with a random string
 
-The JPG mutator disassembles the sample input using the standard JPG file format into a list of structures. Each field may be randomly mutated before being repacked into something resembling a valid JPG file.
-	- Mutate a random field generally
-	- Swap the position of one field with another at random
+Our JPG mutator dissasssembles the sample input into a list of JPG segments using custom code. Each segment may be randomly mutated before being repacked into something resembling a valid JPG file. We currently support the following mutations for JPG:
+- Perform any generic mutations on the segment header bytes, segment length bytes or segment content bytes
+- Swap the position of one segment with another at random
+
+Our XML mutator disassembles the sample input into an element tree. We support the following mutations to each element of the tree:
+- Replace the element with a random string which may or may not contain special characters
