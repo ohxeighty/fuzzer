@@ -122,7 +122,7 @@ class Harness:
         # from run to run
         self.breakpoints = dict() 
 
-        # x86 registers
+        # x64 register struct
         self.registers = user_regs_struct() 
 
         # hokay, now we use angr to extract our basic block vector which we use for code coverage
