@@ -134,13 +134,14 @@ class Harness:
         
         self.bbv = []
         for node in self.cfg.functions.values():
+            #print(self.cfg.functions[0x8049289])
             # ignore some functions
             if not node.name.startswith("__"):
                 # we dont care about externs
                 symbol = self.angr_project.loader.find_symbol(node.addr)
                 # drop some setup funcs
                 if symbol:
-                    if symbol.is_export or symbol.is_import:
+                    if symbol.is_import:
                         continue
                     if symbol.name in skip_setup_funcs:
                         continue
