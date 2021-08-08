@@ -68,7 +68,7 @@ class JpgMutator(mutator.Mutator):
             headers.append(headers[randfield])
         return headers
 
-    def mangle.swap(self):
+    def mangle_swap(self):
         nums = list(range(self.size))
         c1 = choice(nums)
         nums = nums[0:c1] + nums[c1+1:]
