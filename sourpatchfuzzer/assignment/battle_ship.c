@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int main(int argc, char* argv) {
+int main(int argc, char* argv[]) {
     char** p1_ships = malloc(5*sizeof(char*));
     char** p2_ships = malloc(5*sizeof(char*));
     for(int i = 0; i < 5; i++) {
@@ -17,37 +17,38 @@ int main(int argc, char* argv) {
     FILE* log = fopen(argv[1], "r");
     if(log == NULL) {
         printf("Couldn't open game log!\n");
+        return 0;
     }
     fgets(p1_ships[0], 64, log);
-    fgets(p2_ships[1], 64, log);
-    fgets(p3_ships[2], 64, log);
-    fgets(p4_ships[3], 64, log);
-    fgets(p5_ships[4], 64, log);
+    fgets(p1_ships[1], 64, log);
+    fgets(p1_ships[2], 64, log);
+    fgets(p1_ships[3], 64, log);
+    fgets(p1_ships[4], 64, log);
     fgets(p2_ships[0], 64, log);
     fgets(p2_ships[1], 64, log);
     fgets(p2_ships[2], 64, log);
     fgets(p2_ships[3], 64, log);
     fgets(p2_ships[4], 64, log);
-    printf("Player one's aircraft carrier: ");
+    printf("\nPlayer one's aircraft carrier: ");
     printf(p1_ships[0]);
-    printf("\nPlayer one's battle ship: ");
+    printf("Player one's battle ship: ");
     printf(p1_ships[1]);
-    printf("\nPlayer one's submarine: ");
+    printf("Player one's submarine: ");
     printf(p1_ships[2]);
-    printf("\nPlayer one's destroyer: ");
+    printf("Player one's destroyer: ");
     printf(p1_ships[3]);
-    printf("\nPlayer one's frigate: ");
+    printf("Player one's frigate: ");
     printf(p1_ships[4]);
 
     printf("\nPlayer two's aircraft carrier: ");
     printf(p2_ships[0]);
-    printf("\nPlayer two's battle ship: ");
+    printf("Player two's battle ship: ");
     printf(p2_ships[1]);
-    printf("\nPlayer two's submarine: ");
+    printf("Player two's submarine: ");
     printf(p2_ships[2]);
-    printf("\nPlayer two's destroyer: ");
+    printf("Player two's destroyer: ");
     printf(p2_ships[3]);
-    printf("\nPlayer two's frigate: ");
+    printf("Player two's frigate: ");
     printf(p2_ships[4]);
 
 }
