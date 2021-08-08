@@ -69,19 +69,19 @@ class JpgMutator(mutator.Mutator):
         return headers
 
     def mangle_swap(self):
-        nums = list(range(self.size))
+        nums = list(range(self.jpg.size))
         c1 = choice(nums)
         nums = nums[0:c1] + nums[c1+1:]
         c2 = choice(nums)
-        temp = self.datas[c1]
-        self.datas[c1] = self.datas[c2]
-        self.datas[c2] = temp
-        temp = self.lengths[c1]
-        self.lengths[c1] = self.lengths[c2]
-        self.lengths[c2] = temp
-        temp = self.positions[c1]
-        self.positions[c1] = self.positions[c2]
-        self.positions[c2] = temp
-        temp = self.headers[c1]
-        self.headers[c1] = self.headers[c2]
-        self.headers[c2] = temp
+        temp = self.jpg.datas[c1]
+        self.jpg.datas[c1] = self.jpg.datas[c2]
+        self.jpg.datas[c2] = temp
+        temp = self.jpg.lengths[c1]
+        self.jpg.lengths[c1] = self.jpg.lengths[c2]
+        self.jpg.lengths[c2] = temp
+        temp = self.jpg.positions[c1]
+        self.jpg.positions[c1] = self.jpg.positions[c2]
+        self.jpg.positions[c2] = temp
+        temp = self.jpg.headers[c1]
+        self.jpg.headers[c1] = self.jpg.headers[c2]
+        self.jpg.headers[c2] = temp
