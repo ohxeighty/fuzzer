@@ -8,6 +8,9 @@ Currently, our fuzzer is capable of:
 - fuzzing csv inputs (hopefully) using basic mutation strategies, including:
 	- mutating rows with garbage
 	- adding garbage rows 
+- fuzzing jpg (hopefully) using basic mutation strategies, including:
+	- mutating sections and section metadata with garbage
+	- swapping sections 
 - and generally, mutating inputs in these fashions:
 	- removing bytes
 	- adding bytes
@@ -50,5 +53,4 @@ The possible mutations are:
 - The JPG mutator disassembles the sample input using the standard JPG file format into fields
 - Each field may be randomly mutated before being repacked
 	- Mutate a random field generally
-	- Append new rows of random strings
-	- Replace existing rows with random strings
+	- Swap the position of one field with another at random
