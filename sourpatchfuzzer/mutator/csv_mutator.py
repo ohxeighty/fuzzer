@@ -34,7 +34,7 @@ class CsvMutator(mutator.Mutator):
         mutators = [self.field_random_row, self.field_append_rows, self.field_single_mutate]
 
         mutated_list = choice(mutators)()
-        print(mutated_list)
+        #print(mutated_list)
         return self.csv_write(mutated_list)
 
     def complex_mutate(self):
@@ -71,7 +71,7 @@ class CsvMutator(mutator.Mutator):
     def csv_write(self, csv_list):
         # grab headers
         formatted = self.delimiter.join(list(csv_list[0].keys()))
-        print(formatted)
+        #print(formatted)
         for row in csv_list[0:]:
             formatted += self.newline + self.delimiter.join(row.values())
         return formatted.encode("utf-8")
