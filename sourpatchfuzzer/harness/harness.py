@@ -111,7 +111,12 @@ class Harness:
 
         self.ir_pipe = None
         self.iw_pipe = None
-        
+
+
+        # some nice stats
+        self.crash_eips = []
+        self.iterations = 0 
+
         # our hashmap of addresses -> original instruction 
         # that keeps track of our persistent breakpoints
         # from run to run
@@ -302,17 +307,17 @@ class Harness:
     def restore_current_bp(self):
         self.getregs()
         self.registers.eip -= 1 
-        print("Breakpoint @ {}".format(hex(self.registers.eip)))
+        #print("Breakpoint @ {}".format(hex(self.registers.eip)))
         #print(self.angr_project.loader.find_symbol(self.registers.eip))
 
-        print("original val: {}".format(hex(self.breakpoints[self.registers.eip])))
+        #print("original val: {}".format(hex(self.breakpoints[self.registers.eip])))
 
         # reads what currently here 
         current = self.peek(self.registers.eip)
         # then mask appropriately
         original = (current & 0xFFFFFFFFFFFFFF00) | self.breakpoints[self.registers.eip]
 
-        print("will rewrite with: {}".format(hex(original)))
+        #print("will rewrite with: {}".format(hex(original)))
         self.poke(self.registers.eip, original)
         self.setregs()
 

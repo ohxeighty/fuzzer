@@ -10,6 +10,7 @@ from sys import exit, argv
 import time 
 import ptrace 
 import signal
+from functools import partial
 
 TIME_LIMIT = 5 #60*3
 
@@ -30,7 +31,7 @@ So this is what I think our code flow should look like:
     1 is probably good enough for midpoint check-in
     2 might be necessary for more complicated fuzzing techniques
 """
-def fuzz(binary, sample, verbose):
+def fuzz(binary, sample, verbose, prog):
     """
     block based code coverage? edge coverage is hard and requires actual... algorithms (and source)
     and if we got X amount of time without new coverage, we start from scratch? (bandaid 
@@ -70,19 +71,20 @@ def fuzz(binary, sample, verbose):
     
     # Loop for whole timelimit 
     # In future - try multiple strategies in time limit
-    prog = harness.Harness(binary)
     
     while(1):
+        prog.iterations += 1 
+
 
         # in future, call parent method -> give me a mutation..     
         current_input = strategy()
+
+        # Spawn process - should be stopped after exec. 
+        pid, status = prog.spawn_process(stdout=False)
         if verbose:
             print(strategy)
             print(current_input)
             print("pid {}".format(pid))
-
-        # Spawn process - should be stopped after exec. 
-        pid, status = prog.spawn_process(stdout=False)
         prog.getregs()
         # Now that the process has been spawned, we can populate the breakpoints
         prog.populate_breakpoints()
@@ -109,6 +111,11 @@ def fuzz(binary, sample, verbose):
             if(os.WIFSTOPPED(status) and (os.WSTOPSIG(status) == signal.SIGSEGV)):
                 # Placeholder -> Need to create file with crash input and integrate 
                 # fuzzing engine. 
+
+                # Update stats
+                prog.getregs()
+                prog.crash_eips.append(prog.registers.eip) 
+
                 print("Input crashed program with signal: {}".format(os.WSTOPSIG(status)))
                 with open("bad.txt", "ab+") as f:
                     # write the byte string
@@ -126,12 +133,17 @@ def fuzz(binary, sample, verbose):
             #prog.step()
             prog.cont()
 
-def timeout(num, stack):
+def timeout(num, stack, prog):
     print("=========================================")
     print("Time limit reached: {} arbitrary time units".format(TIME_LIMIT))
     print("Faulting inputs have been logged to bad.txt")
     print("You look nice today :)")
     # We could put a neat summary here
+
+    print("Total crashes: {}".format(len(prog.crash_eips)))
+    print("Unique crashes: {}".format(len(set(prog.crash_eips))))
+    print("Total iterations: {}".format(prog.iterations))
+
     exit(0)
 
 
@@ -155,8 +167,12 @@ if __name__ == '__main__':
     args.binary = os.path.abspath(args.binary)
     args.sample = os.path.abspath(args.sample)
     
+    # Setup harness
+    prog = harness.Harness(args.binary)
+    
     ## set a timer for 3 minutes
+    signal.signal(signal.SIGALRM, partial(timeout, prog=prog))
     #signal.signal(signal.SIGALRM, timeout)
-    #signal.alarm(TIME_LIMIT)
-
-    fuzz(args.binary, args.sample, args.verbose)
+    signal.alarm(TIME_LIMIT)
+    
+    fuzz(args.binary, args.sample, args.verbose, prog)
