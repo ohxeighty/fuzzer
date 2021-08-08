@@ -31,7 +31,7 @@ So this is what I think our code flow should look like:
     1 is probably good enough for midpoint check-in
     2 might be necessary for more complicated fuzzing techniques
 """
-def fuzz(binary, sample, verbose, prog):
+def fuzz(binary, sample, verbose,loop_limit, prog):
     """
     block based code coverage? edge coverage is hard and requires actual... algorithms (and source)
     and if we got X amount of time without new coverage, we start from scratch? (bandaid 
@@ -72,9 +72,13 @@ def fuzz(binary, sample, verbose, prog):
     # Loop for whole timelimit 
     # In future - try multiple strategies in time limit
     cov = float(0)
+    last = 0
     while(1):
         prog.iterations += 1 
-
+        if (prog.iterations - last >= loop_limit):
+            prog.reinit_breakpoints
+            cov = float(0)
+            mutations.reset()
 
         # in future, call parent method -> give me a mutation..     
         current_input = strategy()
@@ -85,7 +89,6 @@ def fuzz(binary, sample, verbose, prog):
         # Now that the process has been spawned, we can populate the breakpoints
         prog.populate_breakpoints()
         if verbose:
-            print(strategy)
             print(current_input)
             print("coverage: {}, this run: {}".format(prog.coverage(), cov))
             print("pid {}".format(pid))
@@ -103,6 +106,7 @@ def fuzz(binary, sample, verbose, prog):
         if prog.coverage() > cov:
             cov = prog.coverage()
             mutations.add_pop(current_input)
+            last = prog.iterations
         # Wait for something to happen. 
         while(1):
             # sigsegv doesn't count as a termination signal.
@@ -159,6 +163,7 @@ if __name__ == '__main__':
     parser.add_argument('binary', help='binary to fuzz through')
     parser.add_argument('sample', help='sample valid input for binary')
     parser.add_argument('-v','--verbose', help='show all generated output', action="store_true", default=False)
+    parser.add_argument('-l','--loop_limit', help='loops to a stale population', type=int, default=10000)
     args = parser.parse_args()
     if os.path.exists("bad.txt"):
         os.remove("bad.txt")
@@ -182,4 +187,4 @@ if __name__ == '__main__':
     #signal.signal(signal.SIGALRM, timeout)
     signal.alarm(TIME_LIMIT)
     
-    fuzz(args.binary, args.sample, args.verbose, prog)
+    fuzz(args.binary, args.sample, args.verbose,args.loop_limit, prog)

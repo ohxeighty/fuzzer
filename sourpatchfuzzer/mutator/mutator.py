@@ -54,7 +54,8 @@ class Mutator:
         return s*2
 
     # Population controls:
-
+    def reset(self):
+        self.population = [self.data]
     def add_pop(self, pop):
         self.population.append(pop)
         return
