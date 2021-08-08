@@ -10,6 +10,7 @@ class XmlMutator(mutator.Mutator):
     why doesn't this work
     """
     def __init__(self, sample, min=2, max=10):
+        self.data = sample
         self.xml = sample # should be an ElementTree structure
         self.root = self.xml.getroot()
         mutator.Mutator.__init__(self, None, min, max)
