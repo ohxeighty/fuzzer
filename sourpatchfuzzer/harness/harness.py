@@ -150,8 +150,13 @@ class Harness:
                         continue
                     for block in node.blocks:
                         self.bbv.append(block.addr)
-                        # initialise breakpoints 
+                        # initialize bp
                         self.breakpoints[block.addr] = 0 
+
+    def reinit_breakpoints(self):
+        self.breakpoints = dict()
+        for block in self.bbv:
+            self.breakpoints[block.addr] = 0 
 
     def populate_breakpoints(self):
         # pretty sure the process has to be stopped 

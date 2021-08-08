@@ -33,7 +33,8 @@ class CsvMutator(mutator.Mutator):
 
         mutators = [self.field_random_row, self.field_append_rows, self.field_single_mutate]
 
-        mutated_list = choice(mutators)()
+        c = choice(mutators)
+        mutated_list = c()
         #print(mutated_list)
         return self.csv_write(mutated_list)
 
@@ -45,8 +46,11 @@ class CsvMutator(mutator.Mutator):
         mutated_list = self.csv_list.copy()
         rand_row = randrange(0, len(self.csv_list)) 
         rand_key = choice(self.csv_headers)
-    
-        mutated_list[rand_row][rand_key] = self.mutate(self.csv_list[rand_row][rand_key])
+        # bandaid patch for None
+        replace = self.mutate(self.csv_list[rand_row][rand_key])
+        if not replace:
+            replace = ""
+        mutated_list[rand_row][rand_key] = replace
         return mutated_list
         
 
