@@ -39,7 +39,7 @@ class Mutator:
 
     # ====================================================== 
     def insert_special(self, s):
-        special = [b'\0',b'\n',b'%p',b'%s',b'\r',b'\b',b'\t',b'\f',b'\\',b'\x7f']
+        special = [b'\0',b'\n',b'%p',b'%n',b'%s',b'\r',b'\b',b'\t',b'\f',b'\\',b'\x7f',b'\xff']
         pos = randint(0, len(s))
         if isinstance(s, str):
             randchar = chr(choice(special))

@@ -34,23 +34,38 @@ The target binary is spawned under a child process with fork + exec.
 Two pipes are created for IO: one pipe sends data from the harness into STDIN and the other pipe is used to communicate errors/crashes (when spawning) back up to the harness.
 
 ### Mutators
-- The JSON mutator disassembles the sample input using a json library into fields
-- Each field is individually and randomly mutated depending on what type of data the field is
-- The possible mutations are:
-	- Set a field to null
-	- Set a field to a very large int
-	- Set a field to a random string
-	- If possible, replace a string with its integer representation, and vice versa
-	- Manipulate an integer up or down randomly
+Our mutator consists of a generic mutator and several filetype-specific mutators. Our basic generic mutation strategy includes the following possible mutations:
+- Delete random bytes in the input file
+- Insert random bytes into the input file
+- Flip random bits in the input file
+- Insert special characters (such as null bytes, line breaks and format strings) into the input file
+- Return the input file but duplicated to an absurd length
 
-- The CSV mutator disassembles the sample input using a csv library into fields
+We currently support the following specific mutators:
+- CSV
+- JPG
+- JSON
+- XML
+
+Our JSON mutator disassembles the sample input using a json library into fields. Our main strategies for mutating JSON input files is to mutate individual fields at random, depending on what type of data the field is supposed to be, and to corrupt the overall structure of the JSON file. The JSON specific mutator supports the following mutations to field contents:
+- Set a random field's contents to null
+- Set a random field's contents to a very large integer
+- Set a random field's contents to a random string
+- If the field selected is an integer, change the integer to a random value
+- Replace a field's contents with data of a different type
+
+The JSON mutator also supports structural mutations to the JSON file. Currently, the following mutations to the JSON structure are supported:
+- Duplicate a random line in the input file
+- Swap single quotes in a random line with double quotes and vice versa
+- Perform any generic mutations on random lines
+
+Our CSV mutator disassembles the sample input using a csv library into fields. Fields are then mutated at random individually. Our main strategy for mutating CSV input files is to mutate individual fields at random. mutator disassembles the sample input using a csv library into fields
 - Each field may be randomly mutated before being repacked
-The possible mutations are:
+- The possible mutations are:
 	- Mutate a random field generally
 	- Append new rows of random strings
 	- Replace existing rows with random strings
 
-- The JPG mutator disassembles the sample input using the standard JPG file format into fields
-- Each field may be randomly mutated before being repacked
+The JPG mutator disassembles the sample input using the standard JPG file format into a list of structures. Each field may be randomly mutated before being repacked into something resembling a valid JPG file.
 	- Mutate a random field generally
 	- Swap the position of one field with another at random
