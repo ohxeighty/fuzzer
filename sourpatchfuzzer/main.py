@@ -87,6 +87,7 @@ def fuzz(binary, sample, verbose, prog):
         if verbose:
             print(strategy)
             print(current_input)
+            print("coverage: {}, this run: {}".format(prog.coverage(), cov))
             print("pid {}".format(pid))
         #prog.breakpoint_status()
 
@@ -99,7 +100,6 @@ def fuzz(binary, sample, verbose, prog):
         # why in the everloving fuck does RESIZING A TERMINAL alter the behaviour of waitpid ????????
         # sigwinch. thats why. 
         
-        print("coverage: {}, this run: {}".format(prog.coverage(), cov))
         if prog.coverage() > cov:
             cov = prog.coverage()
             mutations.add_pop(current_input)

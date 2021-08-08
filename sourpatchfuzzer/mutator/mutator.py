@@ -32,7 +32,7 @@ class Mutator:
         return output
 
     def complex_mutate(self, invalid_chance = 10):
-        print(self.population)
+        #print(self.population)
         output = self.single_mutate()
         if randint(1,100) <= invalid_chance:
             complex = choice([self.duplicate, self.insert_special])
