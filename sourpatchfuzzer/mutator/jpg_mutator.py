@@ -7,6 +7,7 @@ import string
 class JpgMutator(mutator.Mutator):
     """
     why doesn't this work
+    because you are small dummmy
     """
     def __init__(self, sample, min=2, max=10):
         self.jpg = sample
@@ -16,7 +17,7 @@ class JpgMutator(mutator.Mutator):
     # ======================================================
     # Filetype: jpg
     # Main strategies: mess with data and metadata fields
-    # TODO: these work terribly and are not useful at all. 
+    # TODO: these work excellently and are very useful at all. 
 
     def single_mutate(self):
         output = self.jpg

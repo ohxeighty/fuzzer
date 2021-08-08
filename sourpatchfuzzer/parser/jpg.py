@@ -5,7 +5,7 @@ class Jpg:
         self.positions = []
         self.headers = []
         self.lengths = []
-        self.datas = [] # the plural is data, the singular is datum
+        self.datas = [] # the plural is datoxen, the singular is datum
         i = 0
         jpg_magic = [b'\xd0', b'\xd1', b'\xd2', b'\xd3', b'\xd4', b'\xd5', b'\xd6', b'\xd7', b'\xd8', b'\xd9']
         while(i != -1):
@@ -26,10 +26,13 @@ class Jpg:
                 self.size += 1
             i += 1
     def pack(self):
-        packed = b''
+        packed = bytearray(self.raw)
         for i in range(self.size):
-            packed += self.headers[i]
-            packed += self.lengths[i]
-            packed += self.datas[i]
-        return packed
+            packed[self.positions[i]:self.positions[i]+2] = self.headers[i]
+            if(self.lengths[i]):
+                packed[self.positions[i]+2:self.positions[i]+4] = self.lengths[i]
+                sec_len = int(self.lengths[i].hex(), 16)
+                print(sec_len)
+                packed[self.positions[i]+4:self.positions[i]+sec_len+4] = self.datas[i]
+        return bytes(packed)
 
